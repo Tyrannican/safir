@@ -1,3 +1,13 @@
+//! Safir handles the logic of writing key/value pairs to disk
+//!
+//! Provides a simple wrapper around a Hash Map which stores values  with given keys
+//! to a JSON file on disk so that you can load them up in other shell sessions.
+//!
+//! Prevents the faff around having to add rely on shell history or RC files for items
+//! that you don't usually want to persist around.
+//!
+//! Safir gives you the option to add / get / remove items from the store
+//! and to clear / purge when you're finished with them.
 use std::{
     collections::HashMap,
     fs::{File, OpenOptions},
@@ -5,6 +15,7 @@ use std::{
     path::PathBuf,
 };
 
+/// Safir Store (fancy wrapper around reading and writing to a JSON file)
 #[derive(Default)]
 pub struct Safir {
     pub path: PathBuf,
@@ -24,6 +35,7 @@ impl Safir {
         Ok(safir)
     }
 
+    /// Add an entry to the store and write it out to disk
     pub fn add_entry(&mut self, key: String, value: String) {
         self.store
             .entry(key)
@@ -33,6 +45,7 @@ impl Safir {
         self.write().expect("unable to write store out to file!");
     }
 
+    /// Get an entry form the store by loading it from disk and displaying it
     pub fn get_entry(&self, key: String) {
         println!("--=Safirstore=--\n");
         if let Some(val) = self.store.get(&key) {
@@ -43,6 +56,7 @@ impl Safir {
         println!();
     }
 
+    /// Display all key/values in the store
     pub fn display_all(&self) {
         println!("--=Safirstore=--\n");
         for (key, value) in self.store.iter() {
@@ -51,11 +65,16 @@ impl Safir {
         println!();
     }
 
+    /// Remove a key/value pair from the store and update onto disk
     pub fn remove_entry(&mut self, key: String) {
         self.store.remove_entry(&key);
         self.write().expect("unable to update safirstore");
     }
 
+    /// Outputs the key/value pair as a command with the prefix
+    ///
+    /// E.g. With a prefix of `alias` this will display the command as
+    /// `alias {key}="{value}"` with {key} / {value} replaced with their values from the store
     pub fn set_commands(&self, prefix: &str, keys: &Vec<String>) {
         println!("--=Safirstore=--\n");
         for key in keys {
@@ -66,6 +85,7 @@ impl Safir {
         println!();
     }
 
+    /// Clear the the contents of the store and update onto disk
     pub fn clear_entries(&mut self) {
         if self.confirm_entry("Are you sure you want to clear the store?") {
             self.store.clear();
@@ -73,6 +93,7 @@ impl Safir {
         }
     }
 
+    /// Remove the `.safirstore` directory and all contents
     pub fn purge(&mut self) {
         if self.confirm_entry("Are you sure you want to purge Safirstore?") {
             self.path.pop();
@@ -80,6 +101,7 @@ impl Safir {
         }
     }
 
+    /// Confirmation dialog for important calls
     fn confirm_entry(&self, msg: &str) -> bool {
         let mut answer = String::new();
         print!("{} (y/n) ", msg);
@@ -97,6 +119,7 @@ impl Safir {
         false
     }
 
+    /// Load the contents of the store off of disk
     fn load(&mut self) -> Result<()> {
         let mut f = OpenOptions::new()
             .create(true)
@@ -116,6 +139,7 @@ impl Safir {
         Ok(())
     }
 
+    /// Write the contents of the store out to disk in the .safirstore/ directory
     fn write(&self) -> Result<()> {
         let mut writer = BufWriter::new(File::create(&self.path)?);
         serde_json::to_writer_pretty(&mut writer, &self.store)?;

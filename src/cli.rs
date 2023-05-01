@@ -1,5 +1,7 @@
+//! CLI for using the Safir binary
 pub use clap::{Args, Parser, Subcommand};
 
+/// CLI arguments for running the program
 #[derive(Parser, Debug)]
 #[command(author, version)]
 #[command(propagate_version = true)]
@@ -10,6 +12,7 @@ pub struct Cli {
     pub command: Commands,
 }
 
+/// Subcommands for running the program
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Add a value to the store with the given key
@@ -34,6 +37,7 @@ pub enum Commands {
     Purge,
 }
 
+/// Arguments for adding a value to the store with a given key
 #[derive(Args, Debug)]
 pub struct AddArgs {
     /// Name of the item to store
@@ -43,6 +47,7 @@ pub struct AddArgs {
     pub value: String,
 }
 
+/// Arguments for retrieving a value from the store with a given key
 #[derive(Args, Debug)]
 pub struct GetArgs {
     /// Name of the value to retrieve from the store
@@ -51,6 +56,7 @@ pub struct GetArgs {
     pub key: Option<String>,
 }
 
+/// Arguments for removing a value from the store with a given key
 #[derive(Args, Debug)]
 pub struct RemoveArgs {
     /// Name of the value to remove from the store
@@ -59,6 +65,7 @@ pub struct RemoveArgs {
     pub key: String,
 }
 
+/// Arguments for outputting commands with a given prefix
 #[derive(Args, Debug)]
 pub struct SetArgs {
     /// Name of the keys to display (e.g. alias / export)
