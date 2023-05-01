@@ -38,7 +38,7 @@ impl Safir {
         if let Some(val) = self.store.get(&key) {
             println!("{}: \"{}\"", key, val);
         } else {
-            println!("{}: {}", key, "");
+            println!("{}: ", key);
         }
         println!();
     }
@@ -57,8 +57,27 @@ impl Safir {
     }
 
     pub fn clear_entries(&mut self) {
-        self.store.clear();
-        self.write().expect("unable to clear safirstore");
+        if self.confirm_entry() {
+            self.store.clear();
+            self.write().expect("unable to clear safirstore");
+        }
+    }
+
+    fn confirm_entry(&self) -> bool {
+        let mut answer = String::new();
+        print!("Are you sure you want to clear the store? (y/n) ");
+        std::io::stdout().flush().expect("failed to flush buffer");
+
+        let _ = std::io::stdin()
+            .read_line(&mut answer)
+            .expect("unable to get input from user");
+
+        let answer = answer.trim();
+        if answer == "y" || answer == "Y" {
+            return true;
+        }
+
+        false
     }
 
     fn load(&mut self) -> Result<()> {
@@ -70,7 +89,7 @@ impl Safir {
 
         let mut contents = String::new();
         f.read_to_string(&mut contents)?;
-        if contents.len() > 0 {
+        if !contents.is_empty() {
             let store = serde_json::from_str(&contents)?;
             self.store = store;
         } else {
@@ -83,7 +102,7 @@ impl Safir {
     fn write(&self) -> Result<()> {
         let mut writer = BufWriter::new(File::create(&self.path)?);
         serde_json::to_writer_pretty(&mut writer, &self.store)?;
-        writer.write(b"\n")?;
+        writer.write_all(b"\n")?;
         writer.flush()?;
         Ok(())
     }
