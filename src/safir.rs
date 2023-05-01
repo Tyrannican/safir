@@ -23,6 +23,7 @@ pub struct Safir {
 }
 
 impl Safir {
+    /// Initialises the Safirstore if not already initialised
     pub fn init() -> Result<Self> {
         let mut safir = Self::default();
         if let Some(home_dir) = dirs::home_dir() {
