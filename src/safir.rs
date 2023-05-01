@@ -56,6 +56,16 @@ impl Safir {
         self.write().expect("unable to update safirstore");
     }
 
+    pub fn set_commands(&self, prefix: &str, keys: &Vec<String>) {
+        println!("--=Safirstore=--\n");
+        for key in keys {
+            if let Some(value) = self.store.get(key) {
+                println!("{} {}=\"{}\"", prefix, key, value);
+            }
+        }
+        println!();
+    }
+
     pub fn clear_entries(&mut self) {
         if self.confirm_entry("Are you sure you want to clear the store?") {
             self.store.clear();

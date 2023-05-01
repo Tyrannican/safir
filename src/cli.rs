@@ -21,6 +21,12 @@ pub enum Commands {
     /// Remove a value from the store
     Rm(RemoveArgs),
 
+    /// Output the alias command for a key / value pair to be entered into a shell session
+    Alias(SetArgs),
+
+    /// Output the export command for a key / value pair to be entered into a shell session
+    Export(SetArgs),
+
     /// Clear all keys/values from the store
     Clear,
 
@@ -51,4 +57,10 @@ pub struct RemoveArgs {
     ///
     /// Does nothing if they key does not exist
     pub key: String,
+}
+
+#[derive(Args, Debug)]
+pub struct SetArgs {
+    /// Name of the keys to display (e.g. alias / export)
+    pub keys: Vec<String>,
 }

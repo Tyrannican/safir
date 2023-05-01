@@ -22,6 +22,12 @@ fn main() -> std::io::Result<()> {
         Commands::Rm(args) => {
             safir.remove_entry(args.key.clone());
         }
+        Commands::Alias(args) => {
+            safir.set_commands("alias", &args.keys);
+        }
+        Commands::Export(args) => {
+            safir.set_commands("export", &args.keys);
+        }
         Commands::Clear => safir.clear_entries(),
         Commands::Purge => safir.purge(),
     }
