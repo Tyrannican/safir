@@ -34,7 +34,7 @@ impl Safir {
     }
 
     pub fn get_entry(&self, key: String) {
-        println!("--=Safirestore=--\n");
+        println!("--=Safirstore=--\n");
         if let Some(val) = self.store.get(&key) {
             println!("{}: \"{}\"", key, val);
         } else {

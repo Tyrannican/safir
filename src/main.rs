@@ -1,5 +1,6 @@
 mod cli;
 mod safir;
+
 use cli::*;
 use safir::Safir;
 
