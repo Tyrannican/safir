@@ -33,22 +33,27 @@ impl Safir {
         self.write().expect("unable to write store out to file!");
     }
 
-    pub fn get_entry(&self, key: String) -> String {
+    pub fn get_entry(&self, key: String) {
+        println!("--=Safirestore=--\n");
         if let Some(val) = self.store.get(&key) {
-            return val.clone();
+            println!("{}: \"{}\"", key, val);
+        } else {
+            println!("{}: {}", key, "");
         }
-
-        String::from("")
+        println!();
     }
 
     pub fn display_all(&self) {
+        println!("--=Safirstore=--\n");
         for (key, value) in self.store.iter() {
-            println!("{}: {}", key, value);
+            println!("{}: \"{}\"", key, value);
         }
+        println!();
     }
 
     pub fn remove_entry(&mut self, key: String) {
         self.store.remove_entry(&key);
+        self.write().expect("unable to update safirstore");
     }
 
     pub fn clear_entries(&mut self) {

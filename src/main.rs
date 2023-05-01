@@ -13,8 +13,7 @@ fn main() -> std::io::Result<()> {
         }
         Commands::Get(args) => {
             if let Some(key) = &args.key {
-                let entry = safir.get_entry(key.clone());
-                println!("{}: {}", key, entry);
+                safir.get_entry(key.clone());
             } else {
                 safir.display_all();
             }
