@@ -4,28 +4,36 @@ pub use clap::{Args, Parser, Subcommand};
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    pub command: Commands,
 }
 
 #[derive(Subcommand, Debug)]
-enum Commands {
+pub enum Commands {
     /// Add key / value to store
     Add(AddArgs),
 
     /// Get a value from the store
     Get(GetArgs),
 
+    /// Remove a value from the store
+    Rm(RemoveArgs),
+
     /// Clear the store
     Clear,
 }
 
 #[derive(Args, Debug)]
-struct AddArgs {
-    key: String,
-    value: String,
+pub struct AddArgs {
+    pub key: String,
+    pub value: String,
 }
 
 #[derive(Args, Debug)]
-struct GetArgs {
-    key: String,
+pub struct GetArgs {
+    pub key: Option<String>,
+}
+
+#[derive(Args, Debug)]
+pub struct RemoveArgs {
+    pub key: String,
 }
