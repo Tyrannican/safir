@@ -23,6 +23,9 @@ pub enum Commands {
 
     /// Clear all keys/values from the store
     Clear,
+
+    /// Purges the .safirstore directory, removing it and its contents
+    Purge,
 }
 
 #[derive(Args, Debug)]

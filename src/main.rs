@@ -23,6 +23,7 @@ fn main() -> std::io::Result<()> {
             safir.remove_entry(args.key.clone());
         }
         Commands::Clear => safir.clear_entries(),
+        Commands::Purge => safir.purge(),
     }
     Ok(())
 }

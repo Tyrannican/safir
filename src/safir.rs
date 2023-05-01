@@ -57,15 +57,22 @@ impl Safir {
     }
 
     pub fn clear_entries(&mut self) {
-        if self.confirm_entry() {
+        if self.confirm_entry("Are you sure you want to clear the store?") {
             self.store.clear();
             self.write().expect("unable to clear safirstore");
         }
     }
 
-    fn confirm_entry(&self) -> bool {
+    pub fn purge(&mut self) {
+        if self.confirm_entry("Are you sure you want to purge Safirstore?") {
+            self.path.pop();
+            std::fs::remove_dir_all(&self.path).expect("unable to remove safirstore directory");
+        }
+    }
+
+    fn confirm_entry(&self, msg: &str) -> bool {
         let mut answer = String::new();
-        print!("Are you sure you want to clear the store? (y/n) ");
+        print!("{} (y/n) ", msg);
         std::io::stdout().flush().expect("failed to flush buffer");
 
         let _ = std::io::stdin()
