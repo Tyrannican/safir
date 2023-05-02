@@ -19,6 +19,7 @@ Then move the binary in `<repo>/target/release/safir` to somewhere in your `$PAT
 ## Usage
 
 When `safir` is run, it creates a store file in your `$HOME` directory (`$HOME/.safirstore/safirstore.json`).
+
 `safir` comes with several options:
 
 * `add`: This adds a Key / Value pair to the store
