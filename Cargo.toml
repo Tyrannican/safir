@@ -8,7 +8,7 @@ description = "Key/Value store to share values between different shell sessions"
 readme = "README.md"
 homepage = "https://github.com/Tyrannican/safir"
 repository = "https://github.com/Tyrannican/safir" 
-keywords = ["cli", "terminal", "utility"]
+keywords = ["cli", "terminal", "utility", "key-value", "store"]
 categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
