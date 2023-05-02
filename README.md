@@ -1,8 +1,8 @@
 # Safir
 
-A Key/Value store to store information in a common location so it can be shared between shell sessions.
+Simple CLI key/value store.
 
-Basically, just a wrapper around a JSON file in a common place that can be used to add key/value pairs and to query them.
+Store key/value pairs in the terminal and retrieve them later for use like in different shell sessions.
 
 ## Install
 
