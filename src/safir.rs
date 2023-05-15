@@ -15,6 +15,8 @@ use std::{
     path::PathBuf,
 };
 
+use colored::*;
+
 /// Safir Store (fancy wrapper around reading and writing to a JSON file)
 #[derive(Default)]
 pub struct Safir {
@@ -48,22 +50,20 @@ impl Safir {
 
     /// Get an entry form the store by loading it from disk and displaying it
     pub fn get_entry(&self, key: String) {
-        println!("--=Safirstore=--\n");
+        println!("{}", "--=Safirstore=--\n".bold());
         if let Some(val) = self.store.get(&key) {
-            println!("{}: \"{}\"", key, val);
+            println!("{}: \"{}\"", key.bold().yellow(), val);
         } else {
-            println!("{}: ", key);
+            println!("{}: ", key.bold().yellow());
         }
-        println!();
     }
 
     /// Display all key/values in the store
     pub fn display_all(&self) {
-        println!("--=Safirstore=--\n");
+        println!("{}", "--=Safirstore=--\n".bold());
         for (key, value) in self.store.iter() {
-            println!("{}: \"{}\"", key, value);
+            println!("{}: \"{}\"\n", key.bold().yellow(), value);
         }
-        println!();
     }
 
     /// Remove a key/value pair from the store and update onto disk
@@ -77,13 +77,18 @@ impl Safir {
     /// E.g. With a prefix of `alias` this will display the command as
     /// `alias {key}="{value}"` with {key} / {value} replaced with their values from the store
     pub fn set_commands(&self, prefix: &str, keys: &Vec<String>) {
-        println!("--=Safirstore=--\n");
+        println!("{}", "--=Safirstore=--\n".bold());
+        let prefix = match prefix {
+            "alias" => "alias".bold().green(),
+            "export" => "export".bold().magenta(),
+            _ => prefix.bold(),
+        };
+
         for key in keys {
             if let Some(value) = self.store.get(key) {
-                println!("{} {}=\"{}\"", prefix, key, value);
+                println!("{} {}=\"{}\"\n", prefix, key.bold().yellow(), value);
             }
         }
-        println!();
     }
 
     /// Clear the the contents of the store and update onto disk
