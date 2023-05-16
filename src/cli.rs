@@ -21,7 +21,7 @@ pub enum Commands {
     /// Get a value from the store
     Get(GetArgs),
 
-    /// Remove a value from the store
+    /// Remove values from the store
     Rm(RemoveArgs),
 
     /// Output the alias command for a key / value pair to be entered into a shell session
@@ -56,13 +56,13 @@ pub struct GetArgs {
     pub key: Option<String>,
 }
 
-/// Arguments for removing a value from the store with a given key
+/// Arguments for removing values from the store with given keys
 #[derive(Args, Debug)]
 pub struct RemoveArgs {
-    /// Name of the value to remove from the store
+    /// Name of the keys to remove from the store
     ///
-    /// Does nothing if they key does not exist
-    pub key: String,
+    /// Does nothing if the keys do not exist
+    pub key: Vec<String>,
 }
 
 /// Arguments for outputting commands with a given prefix
