@@ -67,8 +67,10 @@ impl Safir {
     }
 
     /// Remove a key/value pair from the store and update onto disk
-    pub fn remove_entry(&mut self, key: String) {
-        self.store.remove_entry(&key);
+    pub fn remove_entry(&mut self, keys: Vec<String>) {
+        for key in &keys {
+            self.store.remove_entry(key);
+        }
         self.write().expect("unable to update safirstore");
     }
 
