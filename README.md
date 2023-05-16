@@ -30,7 +30,7 @@ Usage: safir <COMMAND>
 Commands:
   add     Add a value to the store with the given key
   get     Get a value from the store
-  rm      Remove a value from the store
+  rm      Remove values from the store
   alias   Output the alias command for a key / value pair to be entered into a shell session
   export  Output the export command for a key / value pair to be entered into a shell session
   clear   Clear all keys/values from the store
