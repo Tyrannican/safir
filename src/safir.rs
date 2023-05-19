@@ -17,6 +17,16 @@ use std::{
 
 use colored::*;
 
+/// Formats and prints the message to stdout
+fn print_output(msg: &str) {
+    println!("{}", format!("{}\n", msg));
+}
+
+/// Prints the Safirstore header
+fn print_header() {
+    println!("{}", "--=Safirstore=--\n".bold());
+}
+
 /// Safir Store (fancy wrapper around reading and writing to a JSON file)
 #[derive(Default)]
 pub struct Safir {
@@ -50,19 +60,23 @@ impl Safir {
 
     /// Get an entry form the store by loading it from disk and displaying it
     pub fn get_entry(&self, key: String) {
-        println!("{}", "--=Safirstore=--\n".bold());
-        if let Some(val) = self.store.get(&key) {
-            println!("{}: \"{}\"", key.bold().yellow(), val);
+        print_header();
+        let output = if let Some(val) = self.store.get(&key) {
+            format!("{}: \"{}\"", key.bold().yellow(), val)
         } else {
-            println!("{}: ", key.bold().yellow());
-        }
+            format!("{}: ", key.bold().yellow())
+        };
+
+        print_output(&output);
     }
 
     /// Display all key/values in the store
     pub fn display_all(&self) {
-        println!("{}", "--=Safirstore=--\n".bold());
+        print_header();
+        let mut output: String;
         for (key, value) in self.store.iter() {
-            println!("{}: \"{}\"\n", key.bold().yellow(), value);
+            output = format!("{}: \"{}\"", key.bold().yellow(), value);
+            print_output(&output);
         }
     }
 
@@ -79,7 +93,7 @@ impl Safir {
     /// E.g. With a prefix of `alias` this will display the command as
     /// `alias {key}="{value}"` with {key} / {value} replaced with their values from the store
     pub fn set_commands(&self, prefix: &str, keys: &Vec<String>) {
-        println!("{}", "--=Safirstore=--\n".bold());
+        print_header();
         let prefix = match prefix {
             "alias" => "alias".bold().green(),
             "export" => "export".bold().magenta(),
