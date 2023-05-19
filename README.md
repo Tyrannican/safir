@@ -14,7 +14,7 @@ To build from source, clone the repository and run:
 cargo build --release
 ```
 
-Then move the binary in `<repo>/target/release/safir` to somewhere in your `$PATH`
+Then move the binary to somewhere in your `$PATH`
 
 ## Usage
 
