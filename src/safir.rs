@@ -17,6 +17,8 @@ use std::{
 
 use colored::*;
 
+use rubin::store::persistence::PersistentStore;
+
 /// Formats and prints the message to stdout
 fn print_output(msg: &str) {
     println!("{}", format!("{}\n", msg));
@@ -28,53 +30,50 @@ fn print_header() {
 }
 
 /// Safir Store (fancy wrapper around reading and writing to a JSON file)
-#[derive(Default)]
 pub struct Safir {
-    pub path: PathBuf,
-    pub store: HashMap<String, String>,
+    pub store: PersistentStore,
 }
 
 impl Safir {
     /// Initialises the Safirstore if not already initialised
-    pub fn init() -> Result<Self> {
-        let mut safir = Self::default();
-        if let Some(home_dir) = dirs::home_dir() {
-            let safir_path = home_dir.join(".safirstore");
-            std::fs::create_dir_all(&safir_path)?;
-            safir.path = safir_path.join("safirstore.json");
-            safir.load()?;
-        }
+    pub async fn init() -> Result<Self> {
+        let home_dir = dirs::home_dir().unwrap();
+        let store_path = home_dir.join(".safirstore");
+        let mut ps = if store_path.exists() {
+            PersistentStore::from_existing(store_path).await?
+        } else {
+            PersistentStore::new(store_path).await?
+        };
 
-        Ok(safir)
+        ps.set_write_on_update(true);
+        Ok(Self { store: ps })
     }
 
     /// Add an entry to the store and write it out to disk
-    pub fn add_entry(&mut self, key: String, value: String) {
-        self.store
-            .entry(key)
-            .and_modify(|entry| *entry = value.clone())
-            .or_insert(value);
-
-        self.write().expect("unable to write store out to file!");
+    pub async fn add_entry(&mut self, key: String, value: String) -> Result<String> {
+        self.store.insert_string(&key, &value).await
     }
 
     /// Get an entry form the store by loading it from disk and displaying it
-    pub fn get_entry(&self, key: String) {
+    pub fn get_entry(&self, key: String) -> Result<()> {
         print_header();
-        let output = if let Some(val) = self.store.get(&key) {
+        let output = if let Ok(val) = self.store.get_string(&key) {
             format!("{}: \"{}\"", key.bold().yellow(), val)
         } else {
             format!("{}: ", key.bold().yellow())
         };
 
         print_output(&output);
+
+        Ok(())
     }
 
     /// Display all key/values in the store
     pub fn display_all(&self) {
         print_header();
         let mut output: String;
-        for (key, value) in self.store.iter() {
+        // TODO: Not clean, need to find a better way
+        for (key, value) in self.store.store.strings.iter() {
             output = format!("{}: \"{}\"", key.bold().yellow(), value);
             print_output(&output);
         }
@@ -82,10 +81,7 @@ impl Safir {
 
     /// Remove a key/value pair from the store and update onto disk
     pub fn remove_entry(&mut self, keys: Vec<String>) {
-        for key in &keys {
-            self.store.remove_entry(key);
-        }
-        self.write().expect("unable to update safirstore");
+        println!("Not supported yet!");
     }
 
     /// Outputs the key/value pair as a command with the prefix
@@ -101,7 +97,7 @@ impl Safir {
         };
 
         for key in keys {
-            if let Some(value) = self.store.get(key) {
+            if let Ok(value) = self.store.get_string(key) {
                 println!("{} {}=\"{}\"\n", prefix, key.bold().yellow(), value);
             }
         }
