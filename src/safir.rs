@@ -8,14 +8,11 @@
 //!
 //! Safir gives you the option to add / get / remove items from the store
 //! and to clear / purge when you're finished with them.
-use std::{
-    collections::HashMap,
-    fs::{File, OpenOptions},
-    io::{BufWriter, Read, Result, Write},
-    path::PathBuf,
-};
+use std::io::{Result, Write};
 
 use colored::*;
+
+use rubin::store::persistence::PersistentStore;
 
 /// Formats and prints the message to stdout
 fn print_output(msg: &str) {
@@ -28,64 +25,62 @@ fn print_header() {
 }
 
 /// Safir Store (fancy wrapper around reading and writing to a JSON file)
-#[derive(Default)]
 pub struct Safir {
-    pub path: PathBuf,
-    pub store: HashMap<String, String>,
+    pub store: PersistentStore,
 }
 
 impl Safir {
     /// Initialises the Safirstore if not already initialised
-    pub fn init() -> Result<Self> {
-        let mut safir = Self::default();
-        if let Some(home_dir) = dirs::home_dir() {
-            let safir_path = home_dir.join(".safirstore");
-            std::fs::create_dir_all(&safir_path)?;
-            safir.path = safir_path.join("safirstore.json");
-            safir.load()?;
-        }
+    pub async fn init() -> Result<Self> {
+        let home_dir = dirs::home_dir().unwrap();
+        let store_path = home_dir.join(".safirstore/safirstore.json");
+        let mut ps = if store_path.exists() {
+            PersistentStore::from_existing(store_path).await?
+        } else {
+            PersistentStore::new(store_path).await?
+        };
 
-        Ok(safir)
+        ps.set_write_on_update(true);
+        Ok(Self { store: ps })
     }
 
     /// Add an entry to the store and write it out to disk
-    pub fn add_entry(&mut self, key: String, value: String) {
-        self.store
-            .entry(key)
-            .and_modify(|entry| *entry = value.clone())
-            .or_insert(value);
-
-        self.write().expect("unable to write store out to file!");
+    pub async fn add_entry(&mut self, key: String, value: String) -> Result<String> {
+        self.store.insert_string(&key, &value).await
     }
 
     /// Get an entry form the store by loading it from disk and displaying it
-    pub fn get_entry(&self, key: String) {
+    pub fn get_entry(&self, key: String) -> Result<()> {
         print_header();
-        let output = if let Some(val) = self.store.get(&key) {
+        let output = if let Ok(val) = self.store.get_string(&key) {
             format!("{}: \"{}\"", key.bold().yellow(), val)
         } else {
             format!("{}: ", key.bold().yellow())
         };
 
         print_output(&output);
+
+        Ok(())
     }
 
     /// Display all key/values in the store
     pub fn display_all(&self) {
         print_header();
         let mut output: String;
-        for (key, value) in self.store.iter() {
+        let strings = self.store.get_string_store_ref();
+        for (key, value) in strings.iter() {
             output = format!("{}: \"{}\"", key.bold().yellow(), value);
             print_output(&output);
         }
     }
 
     /// Remove a key/value pair from the store and update onto disk
-    pub fn remove_entry(&mut self, keys: Vec<String>) {
+    pub async fn remove_entry(&mut self, keys: Vec<String>) -> Result<()> {
         for key in &keys {
-            self.store.remove_entry(key);
+            self.store.remove_string(key).await?;
         }
-        self.write().expect("unable to update safirstore");
+
+        Ok(())
     }
 
     /// Outputs the key/value pair as a command with the prefix
@@ -101,25 +96,26 @@ impl Safir {
         };
 
         for key in keys {
-            if let Some(value) = self.store.get(key) {
+            if let Ok(value) = self.store.get_string(key) {
                 println!("{} {}=\"{}\"\n", prefix, key.bold().yellow(), value);
             }
         }
     }
 
     /// Clear the the contents of the store and update onto disk
-    pub fn clear_entries(&mut self) {
+    pub async fn clear_entries(&mut self) -> Result<()> {
         if self.confirm_entry("Are you sure you want to clear the store?") {
-            self.store.clear();
-            self.write().expect("unable to clear safirstore");
+            self.store.clear_strings().await?;
         }
+
+        Ok(())
     }
 
-    /// Remove the `.safirstore` directory and all contents
+    /// Remove the store directory and all contents
     pub fn purge(&mut self) {
         if self.confirm_entry("Are you sure you want to purge Safirstore?") {
-            self.path.pop();
-            std::fs::remove_dir_all(&self.path).expect("unable to remove safirstore directory");
+            std::fs::remove_dir_all(&self.store.path)
+                .expect("unable to remove safirstore directory");
         }
     }
 
@@ -139,34 +135,5 @@ impl Safir {
         }
 
         false
-    }
-
-    /// Load the contents of the store off of disk
-    fn load(&mut self) -> Result<()> {
-        let mut f = OpenOptions::new()
-            .create(true)
-            .read(true)
-            .write(true)
-            .open(&self.path)?;
-
-        let mut contents = String::new();
-        f.read_to_string(&mut contents)?;
-        if !contents.is_empty() {
-            let store = serde_json::from_str(&contents)?;
-            self.store = store;
-        } else {
-            self.write()?;
-        }
-
-        Ok(())
-    }
-
-    /// Write the contents of the store out to disk in the .safirstore/ directory
-    fn write(&self) -> Result<()> {
-        let mut writer = BufWriter::new(File::create(&self.path)?);
-        serde_json::to_writer_pretty(&mut writer, &self.store)?;
-        writer.write_all(b"\n")?;
-        writer.flush()?;
-        Ok(())
     }
 }
