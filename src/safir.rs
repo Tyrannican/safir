@@ -45,7 +45,7 @@ impl Safir {
     }
 
     /// Add an entry to the store and write it out to disk
-    pub async fn add_entry(&mut self, key: String, value: String) -> Result<String> {
+    pub async fn add_entry(&mut self, key: String, value: String) -> Result<()> {
         self.store.insert_string(&key, &value).await
     }
 
