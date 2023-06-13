@@ -41,3 +41,10 @@ Options:
   -h, --help     Print help
   -V, --version  Print version
 ```
+
+## v0.3.0 -> v0.4.0
+
+v0.4.0 introduces a breaking change which makes it incompatible with older versions of Safir.
+
+To prevent issues, please remove the old `.safirstore/` directory (store the old data somewhere) and re-run Safir.
+This should address any issues!
