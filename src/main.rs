@@ -1,12 +1,14 @@
 mod cli;
 mod safir;
+mod utils;
 
 use cli::*;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let cli = Cli::parse();
-    let mut safir = safir::Safir::init().await?;
+    let store_dir = utils::create_safir_directory()?;
+    let mut safir = safir::Safir::init(&store_dir).await?;
 
     match &cli.command {
         Commands::Add(args) => {
@@ -34,6 +36,10 @@ async fn main() -> std::io::Result<()> {
             safir.clear_entries().await?;
         }
         Commands::Purge => safir.purge(),
+        Commands::Mem(args) => match args {
+            MemArgs::Start => println!("Starting mem server!"),
+            MemArgs::Stop => println!("Stopping mem server!"),
+        },
     }
     Ok(())
 }

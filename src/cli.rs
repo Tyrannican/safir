@@ -35,6 +35,10 @@ pub enum Commands {
 
     /// Purges the .safirstore directory, removing it and its contents
     Purge,
+
+    /// Start or stop the Mem service
+    #[clap(subcommand)]
+    Mem(MemArgs),
 }
 
 /// Arguments for adding a value to the store with a given key
@@ -70,4 +74,14 @@ pub struct RemoveArgs {
 pub struct SetArgs {
     /// Name of the keys to display (e.g. alias / export)
     pub keys: Vec<String>,
+}
+
+/// Arguments for the Mem sub command
+#[derive(Subcommand, Debug)]
+pub enum MemArgs {
+    /// Start the Safir Memcache server
+    Start,
+
+    /// Stop the Safir Memcache server
+    Stop,
 }
