@@ -4,6 +4,8 @@ mod utils;
 
 use cli::*;
 
+use std::process::{Command, Stdio};
+
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let cli = Cli::parse();
@@ -37,7 +39,17 @@ async fn main() -> std::io::Result<()> {
         }
         Commands::Purge => safir.purge(),
         Commands::Mem(args) => match args {
-            MemArgs::Start => println!("Starting mem server!"),
+            MemArgs::Start => {
+                let child = Command::new("rubin")
+                    .args(&["server"])
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .stdin(Stdio::null())
+                    .spawn()
+                    .expect("unable to spawn child process");
+
+                println!("Memcache started - {}", child.id());
+            }
             MemArgs::Stop => println!("Stopping mem server!"),
         },
     }
