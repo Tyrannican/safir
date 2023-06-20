@@ -55,6 +55,7 @@ pub async fn kill_process(store_dir: &PathBuf, pid: u32) -> io::Result<()> {
 
 #[cfg(target_os = "windows")]
 pub async fn kill_process(store_dir: &PathBuf, pid: u32) {
+    println!("*** Windows -- This is experimental and may not work as intended! ***");
     let output = Command::new("taskkill")
         .arg("/F")
         .arg("/PID")
