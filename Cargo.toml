@@ -22,6 +22,7 @@ colored = "2"
 rubin = "0.3.0"
 tokio = { version = "1.28.2", features = ["full"] }
 psutil = { version = "3.2.2", optional = true }
+which = "4.4.0"
 
 [target.'cfg(unix)'.dependencies]
 psutil = "3.2.2"
