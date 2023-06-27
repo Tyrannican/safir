@@ -1,6 +1,8 @@
 // use std::fs;
-use std::io;
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
+
+use colored::*;
 use tokio::fs;
 
 pub fn check_rubin_installed() -> bool {
@@ -49,4 +51,31 @@ pub async fn kill_process(pid: u32) {
     if !output.status.success() {
         eprintln!("failed to terminate process");
     }
+}
+
+/// Formats and prints the message to stdout
+pub fn print_output(msg: &str) {
+    println!("{}", format!("{}\n", msg));
+}
+
+/// Prints the Safirstore header
+pub fn print_header() {
+    println!("{}", "--=Safirstore=--\n".bold());
+}
+/// Confirmation dialog for important calls
+pub fn confirm_entry(msg: &str) -> bool {
+    let mut answer = String::new();
+    print!("{} (y/n) ", msg);
+    std::io::stdout().flush().expect("failed to flush buffer");
+
+    let _ = std::io::stdin()
+        .read_line(&mut answer)
+        .expect("unable to get input from user");
+
+    let answer = answer.trim().to_lowercase();
+    if answer == "y" {
+        return true;
+    }
+
+    false
 }

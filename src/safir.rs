@@ -8,41 +8,12 @@
 //!
 //! Safir gives you the option to add / get / remove items from the store
 //! and to clear / purge when you're finished with them.
-use std::{
-    io::{Result, Write},
-    path::PathBuf,
-};
+use std::{io::Result, path::PathBuf};
 
 use colored::*;
 
+use crate::utils::{confirm_entry, print_header, print_output};
 use rubin::{net::client::RubinClient, store::persistence::PersistentStore};
-
-/// Formats and prints the message to stdout
-fn print_output(msg: &str) {
-    println!("{}", format!("{}\n", msg));
-}
-
-/// Prints the Safirstore header
-fn print_header() {
-    println!("{}", "--=Safirstore=--\n".bold());
-}
-/// Confirmation dialog for important calls
-fn confirm_entry(msg: &str) -> bool {
-    let mut answer = String::new();
-    print!("{} (y/n) ", msg);
-    std::io::stdout().flush().expect("failed to flush buffer");
-
-    let _ = std::io::stdin()
-        .read_line(&mut answer)
-        .expect("unable to get input from user");
-
-    let answer = answer.trim().to_lowercase();
-    if answer == "y" {
-        return true;
-    }
-
-    false
-}
 
 /// Safir Store (fancy wrapper around reading and writing to a JSON file)
 pub struct Safir {

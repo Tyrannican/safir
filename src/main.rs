@@ -39,6 +39,9 @@ async fn main() -> std::io::Result<()> {
             if cfg.memcache_flag {
                 if let Some(key) = &args.key {
                     safir_mem.get_string(&key).await?;
+                } else {
+                    utils::print_header();
+                    utils::print_output("A key is required for memcache GET command!");
                 }
             } else {
                 if let Some(key) = &args.key {
@@ -89,6 +92,16 @@ async fn main() -> std::io::Result<()> {
                     );
                     return Ok(());
                 }
+
+                if let Some(pid) = cfg.memcache_pid {
+                    println!(
+                        "Memcache server is already running on 127.0.0.1:9876 - PID {}",
+                        pid
+                    );
+
+                    return Ok(());
+                }
+
                 let child = Command::new("rubin")
                     .args(&["server"])
                     .stdout(Stdio::null())
@@ -111,7 +124,7 @@ async fn main() -> std::io::Result<()> {
                 let pid = match cfg.memcache_pid {
                     Some(pid) => pid,
                     None => {
-                        println!("Memcache does not seem to be running");
+                        println!("Memcache does not seem to be running.");
                         return Ok(());
                     }
                 };
