@@ -36,7 +36,7 @@ pub enum Commands {
     /// Purges the .safirstore directory, removing it and its contents
     Purge,
 
-    /// Start or stop the Mem service
+    /// Start or stop the Memcache (in-memory store) service
     #[clap(subcommand)]
     Mem(MemArgs),
 }

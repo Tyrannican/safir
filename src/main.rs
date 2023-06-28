@@ -95,7 +95,7 @@ async fn main() -> std::io::Result<()> {
 
                 if let Some(pid) = cfg.memcache_pid {
                     println!(
-                        "Memcache server is already running on 127.0.0.1:9876 - PID {}",
+                        "Safir memcache server is already running on 127.0.0.1:9876 - PID {}",
                         pid
                     );
 
@@ -113,7 +113,10 @@ async fn main() -> std::io::Result<()> {
                 let pid = child.id();
                 cfg = cfg.pid(Some(pid)).set_memcache(true);
                 cfg.write(&safir_cfg).await?;
-                println!("Memcache server started at 127.0.0.1:9876 - PID {}", pid);
+                println!(
+                    "Safir memcache server started at 127.0.0.1:9876 - PID {}",
+                    pid
+                );
             }
             MemArgs::Stop => {
                 if !utils::check_rubin_installed() {
@@ -124,7 +127,7 @@ async fn main() -> std::io::Result<()> {
                 let pid = match cfg.memcache_pid {
                     Some(pid) => pid,
                     None => {
-                        println!("Memcache does not seem to be running.");
+                        println!("Safir memcache server does not seem to be running.");
                         return Ok(());
                     }
                 };
@@ -137,7 +140,7 @@ async fn main() -> std::io::Result<()> {
                 } else {
                     cfg = cfg.pid(None).set_memcache(false);
                     cfg.write(&safir_cfg).await?;
-                    println!("Stopping memcache server!");
+                    println!("Stopping Safir memcache server!");
                 }
             }
         },
