@@ -5,7 +5,14 @@ Documenting changes between versions beginning from v0.3.0
 ## v0.5.0
 
 Added the ability to operate Safir as a Memcache server (storing contents in-memory instead of on disk).
-Requires the [Rubin CLI](https://crates.io/crates/rubin-cli) to be installed.o
+Requires the [Rubin CLI](https://crates.io/crates/rubin-cli) to be installed.
+
+The Memcache service operates using TCP sockets to communicate with the Rubin server to access and update storage.
+It operates on `localhost` or  `127.0.0.1` and on port `9876`.
+
+It works in the same fashion as Safir and does not update the store on disk when activated.
+
+Initialisation and cleanup is handles with the `start` and `stop` commands.
 
 * New memcache option available for using Safir as an in-memory store
 * Minor edits and bugfixes
