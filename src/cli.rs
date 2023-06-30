@@ -84,4 +84,13 @@ pub enum MemArgs {
 
     /// Stop the Safir Memcache server
     Stop,
+
+    /// Dump the Safir Memcache server to disk
+    Dump(DumpArgs),
+}
+
+#[derive(Args, Debug)]
+pub struct DumpArgs {
+    /// Path to save the store to
+    pub path: String,
 }

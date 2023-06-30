@@ -143,6 +143,11 @@ async fn main() -> std::io::Result<()> {
                     println!("Stopping Safir memcache server!");
                 }
             }
+            MemArgs::Dump(args) => {
+                if let Err(e) = safir_mem.dump_store(&args.path).await {
+                    eprintln!("unable to dump Safir memcache server: {}", e);
+                }
+            }
         },
     }
     Ok(())
