@@ -35,12 +35,42 @@ Commands:
   export  Output the export command for a key / value pair to be entered into a shell session
   clear   Clear all keys/values from the store
   purge   Purges the .safirstore directory, removing it and its contents
+  mem     Start or stop the Memcache (in-memory store) service
   help    Print this message or the help of the given subcommand(s)
 
 Options:
   -h, --help     Print help
   -V, --version  Print version
 ```
+
+## Memcache service
+
+Safir offers the ability to run the store as a dedicate memcache service using in-memory storage.
+
+The service runs on `localhost` or `127.0.0.1` on dedicated port `9876`.
+Once activated, Safir will continue to act as before expect that all new values added are given to the memcache instead of being saved on disk.
+
+This can be enabled / diabled with the `start` and `stop` commands respectively.
+Note that when the memcache service is disabled, ALL data contained within it is lost so use wisely.
+
+In cases where you want to save the contents of the memcache, the `dump` command will allow for the contents to be saved out to disk in JSON format.
+This behaves as a snapshot as the contents of the cache persist after usage.
+
+### Usage
+
+Start or stop the Memcache (in-memory store) service
+
+Usage: safir mem <COMMAND>
+
+Commands:
+  start  Start the Safir Memcache server
+  stop   Stop the Safir Memcache server
+  dump   Dump the Safir Memcache server to disk
+  help   Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
 
 ## v0.3.0 -> v0.4.0
 

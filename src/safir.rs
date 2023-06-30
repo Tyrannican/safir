@@ -171,8 +171,8 @@ impl SafirMemcache {
     }
 
     pub async fn dump_store(&self, path: &str) -> Result<()> {
-        let resp = self.client.dump_store(path).await?;
-        println!("Response: {:?}", resp);
+        self.client.dump_store(path).await?;
+        println!("Safir memcache dumped to {}", path);
 
         Ok(())
     }

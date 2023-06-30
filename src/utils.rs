@@ -1,12 +1,24 @@
-// use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
+use crate::cfg::SafirConfig;
+
 use colored::*;
+use sysinfo::{Pid, System, SystemExt};
 use tokio::fs;
 
 pub fn check_rubin_installed() -> bool {
     if which::which("rubin").is_ok() {
+        return true;
+    }
+
+    false
+}
+
+pub fn check_process_running(pid: u32) -> bool {
+    let mut system = System::new_all();
+    system.refresh_all();
+    if let Some(_) = system.process(Pid::from(pid as usize)) {
         return true;
     }
 
@@ -62,6 +74,7 @@ pub fn print_output(msg: &str) {
 pub fn print_header() {
     println!("{}", "--=Safirstore=--\n".bold());
 }
+
 /// Confirmation dialog for important calls
 pub fn confirm_entry(msg: &str) -> bool {
     let mut answer = String::new();
@@ -78,4 +91,25 @@ pub fn confirm_entry(msg: &str) -> bool {
     }
 
     false
+}
+
+pub async fn load_safir_config(safir_cfg: impl AsRef<Path>) -> io::Result<SafirConfig> {
+    let mut cfg = if path_exists(&safir_cfg).await {
+        SafirConfig::load(&safir_cfg).await?
+    } else {
+        SafirConfig::new()
+    };
+
+    // Used in cases where the process has ended ungracefully and the config hasnt been updated
+    match cfg.memcache_pid {
+        Some(pid) => {
+            if !check_process_running(pid) {
+                cfg = SafirConfig::new();
+                cfg.write(&safir_cfg).await?;
+            }
+        }
+        None => {}
+    }
+
+    Ok(cfg)
 }

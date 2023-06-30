@@ -3,7 +3,6 @@ mod cli;
 mod safir;
 mod utils;
 
-use cfg::SafirConfig;
 use cli::*;
 
 use std::process::{Command, Stdio};
@@ -14,11 +13,7 @@ async fn main() -> std::io::Result<()> {
     let store_dir = utils::create_safir_directory().await?;
     let safir_cfg = &store_dir.join("safir.cfg");
 
-    let mut cfg = if utils::path_exists(&safir_cfg).await {
-        SafirConfig::load(&safir_cfg).await?
-    } else {
-        SafirConfig::new()
-    };
+    let mut cfg = utils::load_safir_config(&safir_cfg).await?;
 
     // Should probably only initialise when not using memcache but meh...
     // Easier this way
@@ -95,7 +90,7 @@ async fn main() -> std::io::Result<()> {
 
                 if let Some(pid) = cfg.memcache_pid {
                     println!(
-                        "Safir memcache server is already running on 127.0.0.1:9876 - PID {}",
+                        "Safir memcache service is already running on 127.0.0.1:9876 - PID {}",
                         pid
                     );
 
@@ -114,7 +109,7 @@ async fn main() -> std::io::Result<()> {
                 cfg = cfg.pid(Some(pid)).set_memcache(true);
                 cfg.write(&safir_cfg).await?;
                 println!(
-                    "Safir memcache server started at 127.0.0.1:9876 - PID {}",
+                    "Safir memcache service started at 127.0.0.1:9876 - PID {}",
                     pid
                 );
             }
@@ -127,28 +122,34 @@ async fn main() -> std::io::Result<()> {
                 let pid = match cfg.memcache_pid {
                     Some(pid) => pid,
                     None => {
-                        println!("Safir memcache server does not seem to be running.");
+                        println!("Safir memcache service does not seem to be running.");
                         return Ok(());
                     }
                 };
 
                 if let Err(err) = utils::kill_process(pid).await {
                     eprintln!(
-                        "memcache server failed to stop, manual removal may be necessary - {}",
+                        "Safir memcache service failed to stop, manual removal may be necessary - {}",
                         err
                     );
                 } else {
                     cfg = cfg.pid(None).set_memcache(false);
                     cfg.write(&safir_cfg).await?;
-                    println!("Stopping Safir memcache server!");
+                    println!("Stopping Safir memcache service!");
                 }
             }
             MemArgs::Dump(args) => {
+                if cfg.memcache_pid.is_none() {
+                    println!("Safir memcache service does not seem to be running");
+                    return Ok(());
+                }
+
                 if let Err(e) = safir_mem.dump_store(&args.path).await {
-                    eprintln!("unable to dump Safir memcache server: {}", e);
+                    eprintln!("unable to dump Safir memcache service: {}", e);
                 }
             }
         },
     }
+
     Ok(())
 }
