@@ -56,6 +56,14 @@ Note that when the memcache service is disabled, ALL data contained within it is
 In cases where you want to save the contents of the memcache, the `dump` command will allow for the contents to be saved out to disk in JSON format.
 This behaves as a snapshot as the contents of the cache persist after usage.
 
+### Requirements
+
+Using this requires that the [Rubin CLI](https://crates.io/crates/rubin-cli) be installed.
+
+```bash
+cargo install rubin-cli
+```
+
 ### Usage
 
 Start or stop the Memcache (in-memory store) service
