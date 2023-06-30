@@ -8,7 +8,7 @@
 //!
 //! Safir gives you the option to add / get / remove items from the store
 //! and to clear / purge when you're finished with them.
-use std::{io::Result, path::PathBuf};
+use std::{io::Result, path::Path};
 
 use colored::*;
 
@@ -22,7 +22,7 @@ pub struct Safir {
 
 impl Safir {
     /// Initialises the Safirstore if not already initialised
-    pub async fn init(store_loc: &PathBuf) -> Result<Self> {
+    pub async fn init(store_loc: &Path) -> Result<Self> {
         let store_path = store_loc.join("safirstore.json");
         let mut ps = if store_path.exists() {
             PersistentStore::from_existing(store_path).await?
@@ -128,7 +128,7 @@ impl SafirMemcache {
 
     pub async fn get_string(&self, key: &str) -> Result<()> {
         print_header();
-        let output = if let Ok(val) = self.client.get_string(&key).await {
+        let output = if let Ok(val) = self.client.get_string(key).await {
             format!("{}: \"{}\"", key.bold().yellow(), val)
         } else {
             format!("{}: ", key.bold().yellow())

@@ -33,17 +33,15 @@ async fn main() -> std::io::Result<()> {
         Commands::Get(args) => {
             if cfg.memcache_flag {
                 if let Some(key) = &args.key {
-                    safir_mem.get_string(&key).await?;
+                    safir_mem.get_string(key).await?;
                 } else {
                     utils::print_header();
                     utils::print_output("A key is required for memcache GET command!");
                 }
+            } else if let Some(key) = &args.key {
+                safir.get_entry(key.clone())?;
             } else {
-                if let Some(key) = &args.key {
-                    safir.get_entry(key.clone())?;
-                } else {
-                    safir.display_all();
-                }
+                safir.display_all();
             }
         }
         Commands::Rm(args) => {
@@ -98,7 +96,7 @@ async fn main() -> std::io::Result<()> {
                 }
 
                 let child = Command::new("rubin")
-                    .args(&["server"])
+                    .args(["server"])
                     .stdout(Stdio::null())
                     .stderr(Stdio::null())
                     .stdin(Stdio::null())

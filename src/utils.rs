@@ -18,7 +18,7 @@ pub fn check_rubin_installed() -> bool {
 pub fn check_process_running(pid: u32) -> bool {
     let mut system = System::new_all();
     system.refresh_all();
-    if let Some(_) = system.process(Pid::from(pid as usize)) {
+    if system.process(Pid::from(pid as usize)).is_some() {
         return true;
     }
 
@@ -67,7 +67,7 @@ pub async fn kill_process(pid: u32) {
 
 /// Formats and prints the message to stdout
 pub fn print_output(msg: &str) {
-    println!("{}", format!("{}\n", msg));
+    println!("{}\n", msg);
 }
 
 /// Prints the Safirstore header
@@ -101,14 +101,11 @@ pub async fn load_safir_config(safir_cfg: impl AsRef<Path>) -> io::Result<SafirC
     };
 
     // Used in cases where the process has ended ungracefully and the config hasnt been updated
-    match cfg.memcache_pid {
-        Some(pid) => {
-            if !check_process_running(pid) {
-                cfg = SafirConfig::new();
-                cfg.write(&safir_cfg).await?;
-            }
+    if let Some(pid) = cfg.memcache_pid {
+        if !check_process_running(pid) {
+            cfg = SafirConfig::new();
+            cfg.write(&safir_cfg).await?;
         }
-        None => {}
     }
 
     Ok(cfg)
