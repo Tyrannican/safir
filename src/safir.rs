@@ -8,21 +8,12 @@
 //!
 //! Safir gives you the option to add / get / remove items from the store
 //! and to clear / purge when you're finished with them.
-use std::io::{Result, Write};
+use std::{io::Result, path::Path};
 
 use colored::*;
 
-use rubin::store::persistence::PersistentStore;
-
-/// Formats and prints the message to stdout
-fn print_output(msg: &str) {
-    println!("{}", format!("{}\n", msg));
-}
-
-/// Prints the Safirstore header
-fn print_header() {
-    println!("{}", "--=Safirstore=--\n".bold());
-}
+use crate::utils::{confirm_entry, print_header, print_output};
+use rubin::{net::client::RubinClient, store::persistence::PersistentStore};
 
 /// Safir Store (fancy wrapper around reading and writing to a JSON file)
 pub struct Safir {
@@ -31,9 +22,8 @@ pub struct Safir {
 
 impl Safir {
     /// Initialises the Safirstore if not already initialised
-    pub async fn init() -> Result<Self> {
-        let home_dir = dirs::home_dir().unwrap();
-        let store_path = home_dir.join(".safirstore/safirstore.json");
+    pub async fn init(store_loc: &Path) -> Result<Self> {
+        let store_path = store_loc.join("safirstore.json");
         let mut ps = if store_path.exists() {
             PersistentStore::from_existing(store_path).await?
         } else {
@@ -104,7 +94,7 @@ impl Safir {
 
     /// Clear the the contents of the store and update onto disk
     pub async fn clear_entries(&mut self) -> Result<()> {
-        if self.confirm_entry("Are you sure you want to clear the store?") {
+        if confirm_entry("Are you sure you want to clear the store?") {
             self.store.clear_strings().await?;
         }
 
@@ -113,27 +103,77 @@ impl Safir {
 
     /// Remove the store directory and all contents
     pub fn purge(&mut self) {
-        if self.confirm_entry("Are you sure you want to purge Safirstore?") {
+        if confirm_entry("Are you sure you want to purge Safirstore?") {
             std::fs::remove_dir_all(&self.store.path)
                 .expect("unable to remove safirstore directory");
         }
     }
+}
 
-    /// Confirmation dialog for important calls
-    fn confirm_entry(&self, msg: &str) -> bool {
-        let mut answer = String::new();
-        print!("{} (y/n) ", msg);
-        std::io::stdout().flush().expect("failed to flush buffer");
+pub struct SafirMemcache {
+    client: RubinClient,
+}
 
-        let _ = std::io::stdin()
-            .read_line(&mut answer)
-            .expect("unable to get input from user");
+impl SafirMemcache {
+    pub fn new() -> Self {
+        Self {
+            client: RubinClient::new("127.0.0.1", 9876),
+        }
+    }
 
-        let answer = answer.trim();
-        if answer == "y" || answer == "Y" {
-            return true;
+    pub async fn add_entry(&self, key: &str, value: &str) -> Result<()> {
+        self.client.insert_string(key, value).await?;
+        Ok(())
+    }
+
+    pub async fn get_string(&self, key: &str) -> Result<()> {
+        print_header();
+        let output = if let Ok(val) = self.client.get_string(key).await {
+            format!("{}: \"{}\"", key.bold().yellow(), val)
+        } else {
+            format!("{}: ", key.bold().yellow())
+        };
+
+        print_output(&output);
+
+        Ok(())
+    }
+
+    pub async fn remove_entry(&self, keys: Vec<String>) -> Result<()> {
+        for key in &keys {
+            self.client.remove_string(key).await?;
         }
 
-        false
+        Ok(())
+    }
+
+    pub async fn set_commands(&self, prefix: &str, keys: &Vec<String>) {
+        print_header();
+        let prefix = match prefix {
+            "alias" => "alias".bold().green(),
+            "export" => "export".bold().magenta(),
+            _ => prefix.bold(),
+        };
+
+        for key in keys {
+            if let Ok(value) = self.client.get_string(key).await {
+                println!("{} {}=\"{}\"\n", prefix, key.bold().yellow(), value);
+            }
+        }
+    }
+
+    pub async fn clear_entries(&self) -> Result<()> {
+        if confirm_entry("Are you sure you want to clear the store?") {
+            self.client.clear_strings().await?;
+        }
+
+        Ok(())
+    }
+
+    pub async fn dump_store(&self, path: &str) -> Result<()> {
+        self.client.dump_store(path).await?;
+        println!("Safir memcache dumped to {}", path);
+
+        Ok(())
     }
 }
