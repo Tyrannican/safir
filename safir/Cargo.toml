@@ -1,0 +1,29 @@
+[package]
+name = "safir"
+version = "0.5.0"
+edition = "2021"
+authors = ["Graham Keenan graham.keenan@outlook.com"]
+license = "MIT OR Apache-2.0"
+description = "Key/Value store to share values between different shell sessions"
+readme = "README.md"
+homepage = "https://github.com/Tyrannican/safir"
+repository = "https://github.com/Tyrannican/safir" 
+keywords = ["cli", "terminal", "utility", "key-value", "store"]
+categories = ["command-line-utilities"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.2.5" , features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+dirs = "5"
+colored = "2"
+rubin = "^0.3.1"
+tokio = { version = "1.28.2", features = ["full"] }
+psutil = { version = "3.2.2", optional = true }
+which = "4.4.0"
+sysinfo = "0.29.3"
+
+[target.'cfg(unix)'.dependencies]
+psutil = "3.2.2"
