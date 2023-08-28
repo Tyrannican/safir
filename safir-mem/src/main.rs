@@ -15,8 +15,6 @@ async fn main() -> std::io::Result<()> {
 
     let mut cfg = utils::load_safir_config(&safir_cfg).await?;
 
-    // Should probably only initialise when not using memcache but meh...
-    // Easier this way
     let safir_mem = safir::SafirMemcache::new();
 
     match &cli.command {

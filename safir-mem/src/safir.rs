@@ -1,13 +1,3 @@
-//! Safir handles the logic of writing key/value pairs to disk
-//!
-//! Provides a simple wrapper around a Hash Map which stores values  with given keys
-//! to a JSON file on disk so that you can load them up in other shell sessions.
-//!
-//! Prevents the faff around having to add rely on shell history or RC files for items
-//! that you don't usually want to persist around.
-//!
-//! Safir gives you the option to add / get / remove items from the store
-//! and to clear / purge when you're finished with them.
 use std::io::Result;
 
 use colored::*;
