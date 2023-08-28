@@ -35,7 +35,6 @@ Commands:
   export  Output the export command for a key / value pair to be entered into a shell session
   clear   Clear all keys/values from the store
   purge   Purges the .safirstore directory, removing it and its contents
-  mem     Start or stop the Memcache (in-memory store) service
   help    Print this message or the help of the given subcommand(s)
 
 Options:
