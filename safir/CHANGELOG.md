@@ -2,6 +2,18 @@
 
 Documenting changes between versions beginning from v0.3.0
 
+## v0.6.0
+
+Removed the Safir Memcache and moved it to its own project.
+
+Addition of the Memcache functionality was making everything a bit messy to best to separate them both.
+They still operate the same, just different projects for each.
+
+Any changes here wil lbe made in the Memcache version also.
+
+* Removal of Memcache
+* Technically a reversion but meh
+
 ## v0.5.0
 
 Added the ability to operate Safir as a Memcache server (storing contents in-memory instead of on disk).
