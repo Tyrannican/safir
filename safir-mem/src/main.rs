@@ -12,10 +12,10 @@ async fn main() -> std::io::Result<()> {
     let cli = Cli::parse();
     let store_dir = utils::create_safir_directory().await?;
     let safir_cfg = &store_dir.join("safir.cfg");
-
     let mut cfg = utils::load_safir_config(&safir_cfg).await?;
 
-    let safir_mem = safir::SafirMemcache::new();
+    let safir_state = utils::is_safir_running(cfg.memcache_pid);
+    let safir_mem = safir::SafirMemcache::new(safir_state);
 
     match &cli.command {
         Commands::Add(args) => safir_mem.add_entry(&args.key, &args.value).await?,
@@ -98,11 +98,6 @@ async fn main() -> std::io::Result<()> {
             }
         }
         Commands::Dump(args) => {
-            if cfg.memcache_pid.is_none() {
-                println!("Safir memcache service does not seem to be running");
-                return Ok(());
-            }
-
             if let Err(e) = safir_mem.dump_store(&args.path).await {
                 eprintln!("unable to dump Safir memcache service: {}", e);
             }

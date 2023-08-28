@@ -25,6 +25,15 @@ pub fn check_process_running(pid: u32) -> bool {
     false
 }
 
+pub fn is_safir_running(pid: Option<u32>) -> bool {
+    match pid {
+        Some(pid) => {
+            return check_process_running(pid);
+        }
+        None => false,
+    }
+}
+
 pub async fn path_exists(path: impl AsRef<Path>) -> bool {
     path.as_ref().exists()
 }

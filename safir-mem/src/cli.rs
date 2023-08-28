@@ -13,7 +13,7 @@ pub struct Cli {
 }
 
 /// Subcommands for running the program
-#[derive(Subcommand, Debug)]
+#[derive(Subcommand, Debug, PartialEq)]
 pub enum Commands {
     /// Add a value to the store with the given key
     Add(AddArgs),
@@ -44,7 +44,7 @@ pub enum Commands {
 }
 
 /// Arguments for adding a value to the store with a given key
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct AddArgs {
     /// Name of the item to store
     pub key: String,
@@ -54,7 +54,7 @@ pub struct AddArgs {
 }
 
 /// Arguments for retrieving a value from the store with a given key
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct GetArgs {
     /// Name of the value to retrieve from the store
     ///
@@ -63,7 +63,7 @@ pub struct GetArgs {
 }
 
 /// Arguments for removing values from the store with given keys
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct RemoveArgs {
     /// Name of the keys to remove from the store
     ///
@@ -72,13 +72,13 @@ pub struct RemoveArgs {
 }
 
 /// Arguments for outputting commands with a given prefix
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct SetArgs {
     /// Name of the keys to display (e.g. alias / export)
     pub keys: Vec<String>,
 }
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, PartialEq)]
 pub struct DumpArgs {
     /// Path to save the store to
     pub path: String,
