@@ -2,7 +2,7 @@
 
 Simple in-memory CLI key/value store.
 
-The in-memory version of [Safir](https://github.com/Tyrannican/safir/safir)!
+The in-memory version of [Safir](https://crates.io/crates/safir)!
 
 `safir-mem` starts a service which runs on `localhost` or `127.0.0.1` on dedicated port `9876`.
 
