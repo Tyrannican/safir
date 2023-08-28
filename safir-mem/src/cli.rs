@@ -5,7 +5,7 @@ pub use clap::{Args, Parser, Subcommand};
 #[derive(Parser, Debug)]
 #[command(author, version)]
 #[command(propagate_version = true)]
-#[command(about = "Key/Value store to share information between shell sessions", long_about = None)]
+#[command(about = "In-memory key/value store to share information between shell sessions", long_about = None)]
 pub struct Cli {
     /// Subcommands
     #[command(subcommand)]
