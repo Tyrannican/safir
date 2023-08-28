@@ -5,7 +5,6 @@ use tokio::{fs, io::AsyncWriteExt};
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct SafirConfig {
     pub memcache_pid: Option<u32>,
-    pub memcache_flag: bool,
 }
 
 impl SafirConfig {
@@ -16,16 +15,6 @@ impl SafirConfig {
     pub async fn load(cfg_path: impl AsRef<Path>) -> Result<Self> {
         let cfg = fs::read_to_string(cfg_path).await?;
         Ok(serde_json::from_str(&cfg).expect("unable to deserialize safir config"))
-    }
-
-    pub fn pid(mut self, pid: Option<u32>) -> Self {
-        self.memcache_pid = pid;
-        self
-    }
-
-    pub fn set_memcache(mut self, state: bool) -> Self {
-        self.memcache_flag = state;
-        self
     }
 
     pub async fn write(&self, cfg_path: impl AsRef<Path>) -> Result<()> {
