@@ -681,13 +681,10 @@ dependencies = [
  "clap",
  "colored",
  "dirs",
- "psutil",
  "rubin",
  "serde",
  "serde_json",
- "sysinfo",
  "tokio",
- "which",
 ]
 
 [[package]]
