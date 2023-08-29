@@ -3,6 +3,13 @@ name = "safir-core"
 version = "0.1.0"
 edition = "2021"
 description = "Internal lib used to build Safir and Safir-mem"
+authors = ["Graham Keenan graham.keenan@outlook.com"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/Tyrannican/safir"
+repository = "https://github.com/Tyrannican/safir" 
+keywords = ["terminal", "utility", "key-value", "store", "library"]
+categories = ["command-line-interface"]
 
 [dependencies]
 colored = "2.0.4"
