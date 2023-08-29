@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-use crate::cfg::SafirConfig;
+use crate::config::SafirConfig;
 
 use colored::*;
 use sysinfo::{Pid, System, SystemExt};

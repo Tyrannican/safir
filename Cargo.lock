@@ -679,34 +679,33 @@ name = "safir"
 version = "0.6.0"
 dependencies = [
  "clap",
- "colored",
- "dirs",
- "rubin",
  "safir-core",
- "serde",
- "serde_json",
  "tokio",
 ]
 
 [[package]]
 name = "safir-core"
 version = "0.1.0"
+dependencies = [
+ "colored",
+ "dirs",
+ "psutil",
+ "rubin",
+ "serde",
+ "serde_json",
+ "sysinfo",
+ "tokio",
+ "which",
+]
 
 [[package]]
 name = "safir-mem"
 version = "0.1.0"
 dependencies = [
  "clap",
- "colored",
- "dirs",
  "psutil",
- "rubin",
  "safir-core",
- "serde",
- "serde_json",
- "sysinfo",
  "tokio",
- "which",
 ]
 
 [[package]]

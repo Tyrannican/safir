@@ -15,15 +15,7 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 clap = { version = "4.2.5" , features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-dirs = "5"
-colored = "2"
-rubin = "^0.3.1"
 tokio = { version = "1.28.2", features = ["full"] }
-psutil = { version = "3.2.2", optional = true }
-which = "4.4.0"
-sysinfo = "0.29.3"
 safir-core = { version = "0.1.0", path = "../safir-core" }
 
 [target.'cfg(unix)'.dependencies]
