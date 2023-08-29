@@ -682,10 +682,15 @@ dependencies = [
  "colored",
  "dirs",
  "rubin",
+ "safir-core",
  "serde",
  "serde_json",
  "tokio",
 ]
+
+[[package]]
+name = "safir-core"
+version = "0.1.0"
 
 [[package]]
 name = "safir-mem"
@@ -696,6 +701,7 @@ dependencies = [
  "dirs",
  "psutil",
  "rubin",
+ "safir-core",
  "serde",
  "serde_json",
  "sysinfo",

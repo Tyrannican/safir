@@ -21,3 +21,4 @@ dirs = "5"
 colored = "2"
 rubin = "^0.3.1"
 tokio = { version = "1.28.2", features = ["full"] }
+safir-core = { version = "0.1.0", path = "../safir-core" }

@@ -1,3 +1,3 @@
 [workspace]
-members = ["safir", "safir-mem"]
+members = ["safir", "safir-mem", "safir-core"]
 resolver = "2"
