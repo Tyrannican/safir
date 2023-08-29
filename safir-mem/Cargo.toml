@@ -17,6 +17,3 @@ categories = ["command-line-utilities"]
 clap = { version = "4.2.5" , features = ["derive"] }
 tokio = { version = "1.28.2", features = ["full"] }
 safir-core = { version = "0.1.0", path = "../safir-core" }
-
-[target.'cfg(unix)'.dependencies]
-psutil = "3.2.2"
