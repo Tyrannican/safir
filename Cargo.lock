@@ -676,22 +676,17 @@ checksum = "1ad4cc8da4ef723ed60bced201181d83791ad433213d8c24efffda1eec85d741"
 
 [[package]]
 name = "safir"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "clap",
- "colored",
- "dirs",
- "rubin",
- "serde",
- "serde_json",
+ "safir-core",
  "tokio",
 ]
 
 [[package]]
-name = "safir-mem"
+name = "safir-core"
 version = "0.1.0"
 dependencies = [
- "clap",
  "colored",
  "dirs",
  "psutil",
@@ -701,6 +696,15 @@ dependencies = [
  "sysinfo",
  "tokio",
  "which",
+]
+
+[[package]]
+name = "safir-mem"
+version = "0.2.0"
+dependencies = [
+ "clap",
+ "safir-core",
+ "tokio",
 ]
 
 [[package]]

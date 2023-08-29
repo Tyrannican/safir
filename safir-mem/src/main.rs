@@ -1,9 +1,7 @@
-mod cfg;
 mod cli;
-mod safir;
-mod utils;
 
 use cli::*;
+use safir_core::{mem::SafirMemcache, utils};
 
 use std::process::{Command, Stdio};
 
@@ -15,7 +13,7 @@ async fn main() -> std::io::Result<()> {
     let mut cfg = utils::load_safir_config(&safir_cfg).await?;
 
     let safir_state = utils::is_safir_running(cfg.memcache_pid);
-    let safir_mem = safir::SafirMemcache::new(safir_state);
+    let safir_mem = SafirMemcache::new(safir_state);
 
     match &cli.command {
         Commands::Add(args) => safir_mem.add_entry(&args.key, &args.value).await?,

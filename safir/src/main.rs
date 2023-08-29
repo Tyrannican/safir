@@ -1,14 +1,14 @@
 mod cli;
-mod safir;
-mod utils;
 
 use cli::*;
+
+use safir_core::{disk::Safir, utils};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let cli = Cli::parse();
     let store_dir = utils::create_safir_directory().await?;
-    let mut safir = safir::Safir::init(&store_dir).await?;
+    let mut safir = Safir::init(&store_dir).await?;
 
     match &cli.command {
         Commands::Add(args) => {
