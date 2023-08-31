@@ -7,6 +7,8 @@ pub mod disk;
 pub mod mem;
 pub mod utils;
 
+use std::any::Any;
+
 #[async_trait]
 pub trait SafirEngine {
     async fn add_entry(&mut self, key: String, value: String) -> Result<()>;
@@ -14,6 +16,7 @@ pub trait SafirEngine {
     async fn remove_entry(&mut self, keys: Vec<String>) -> Result<()>;
     async fn clear_entries(&mut self) -> Result<()>;
     async fn set_commands(&mut self, prefix: &str, keys: &Vec<String>);
+    fn to_type(&self) -> &dyn Any;
 }
 
 pub struct Safir {

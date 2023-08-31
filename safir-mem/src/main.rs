@@ -1,7 +1,7 @@
 mod cli;
 
 use cli::*;
-use safir_core::{utils, Safir, SafirEngineType};
+use safir_core::{mem::SafirMemcache, utils, Safir, SafirEngineType};
 
 use anyhow::Result;
 use std::process::{Command, Stdio};
@@ -9,10 +9,14 @@ use std::process::{Command, Stdio};
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
-    let safir_mem = Safir::new(SafirEngineType::Memcache).await?;
+    let mut safir_mem = Safir::new(SafirEngineType::Memcache).await?;
 
     match &cli.command {
-        Commands::Add(args) => safir_mem.add_entry(args.key, args.value).await?,
+        Commands::Add(args) => {
+            safir_mem
+                .add_entry(args.key.to_owned(), args.value.to_owned())
+                .await?
+        }
         Commands::Get(args) => {
             if let Some(key) = &args.key {
                 safir_mem.get_entry(key.to_string()).await?;
@@ -94,7 +98,13 @@ async fn main() -> Result<()> {
             }
         }
         Commands::Dump(args) => {
-            if let Err(e) = safir_mem.engine.dump_store(&args.path).await {
+            let inner = safir_mem
+                .engine
+                .to_type()
+                .downcast_ref::<SafirMemcache>()
+                .expect("unable to get inner reference");
+
+            if let Err(e) = inner.dump_store(&args.path).await {
                 eprintln!("unable to dump Safir memcache service: {}", e);
             }
         }

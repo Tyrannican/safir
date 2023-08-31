@@ -94,6 +94,10 @@ impl SafirEngine for SafirMemcache {
 
         Ok(())
     }
+
+    fn to_type(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl SafirMemcache {

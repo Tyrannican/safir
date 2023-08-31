@@ -81,6 +81,10 @@ impl SafirEngine for SafirStore {
 
         Ok(())
     }
+
+    fn to_type(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl SafirStore {
