@@ -12,6 +12,8 @@ keywords = ["terminal", "utility", "key-value", "store", "library"]
 categories = ["command-line-interface"]
 
 [dependencies]
+anyhow = "1.0.75"
+async-trait = "0.1.73"
 colored = "2.0.4"
 dirs = "5.0.1"
 psutil = "3.2.2"

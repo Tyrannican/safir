@@ -1,4 +1,5 @@
-use std::io::{self, Write};
+use anyhow::Result;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use crate::config::SafirConfig;
@@ -6,6 +7,15 @@ use crate::config::SafirConfig;
 use colored::*;
 use sysinfo::{Pid, System, SystemExt};
 use tokio::fs;
+
+type SafirDirectory = (PathBuf, SafirConfig);
+
+pub async fn init() -> Result<SafirDirectory> {
+    let store_dir = create_safir_directory().await?;
+    let safir_cfg = &store_dir.join("safir.cfg");
+    let cfg = load_safir_config(&safir_cfg).await?;
+    Ok((store_dir, cfg))
+}
 
 pub fn check_rubin_installed() -> bool {
     if which::which("rubin").is_ok() {
@@ -38,7 +48,7 @@ pub async fn path_exists(path: impl AsRef<Path>) -> bool {
     path.as_ref().exists()
 }
 
-pub async fn create_safir_directory() -> io::Result<PathBuf> {
+pub async fn create_safir_directory() -> Result<PathBuf> {
     let home_dir = dirs::home_dir().unwrap();
     let store_path = home_dir.join(".safirstore");
     fs::create_dir_all(&store_path).await?;
@@ -47,7 +57,7 @@ pub async fn create_safir_directory() -> io::Result<PathBuf> {
 }
 
 #[cfg(target_family = "unix")]
-pub async fn kill_process(pid: u32) -> io::Result<()> {
+pub async fn kill_process(pid: u32) -> Result<()> {
     if let Ok(process) = psutil::process::Process::new(pid) {
         if let Err(err) = process.kill() {
             eprintln!("failed to kill process: {}", err);
@@ -102,7 +112,7 @@ pub fn confirm_entry(msg: &str) -> bool {
     false
 }
 
-pub async fn load_safir_config(safir_cfg: impl AsRef<Path>) -> io::Result<SafirConfig> {
+pub async fn load_safir_config(safir_cfg: impl AsRef<Path>) -> Result<SafirConfig> {
     let mut cfg = if path_exists(&safir_cfg).await {
         SafirConfig::load(&safir_cfg).await?
     } else {
