@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use colored::*;
 
 use crate::config::SafirConfig;
-use crate::utils::{self, confirm_entry, init, print_header, print_output};
+use crate::utils::{self, confirm_entry, print_header, print_output};
 use crate::SafirEngine;
 use rubin::net::client::RubinClient;
 

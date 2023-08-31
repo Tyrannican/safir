@@ -1,6 +1,8 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use config::SafirConfig;
+use disk::SafirStore;
+use mem::SafirMemcache;
 
 pub mod config;
 pub mod disk;
@@ -36,17 +38,17 @@ impl Safir {
         match engine_type {
             SafirEngineType::Store => {
                 let e = crate::disk::SafirStore::new(&config).await?;
-                return Ok(Self {
+                Ok(Self {
                     engine: Box::new(e),
                     config,
-                });
+                })
             }
             SafirEngineType::Memcache => {
                 let e = crate::mem::SafirMemcache::new(&config).await?;
-                return Ok(Self {
+                Ok(Self {
                     engine: Box::new(e),
                     config,
-                });
+                })
             }
         }
     }
@@ -73,5 +75,19 @@ impl Safir {
 
     pub async fn set_commands(&mut self, prefix: &str, keys: &Vec<String>) {
         self.engine.set_commands(prefix, keys).await;
+    }
+
+    pub fn as_safir_store(&self) -> &SafirStore {
+        self.engine
+            .to_type()
+            .downcast_ref::<SafirStore>()
+            .expect("unable to get Safir store type")
+    }
+
+    pub fn as_safir_memcache(&self) -> &SafirMemcache {
+        self.engine
+            .to_type()
+            .downcast_ref::<SafirMemcache>()
+            .expect("unable to get Safir memcache type")
     }
 }

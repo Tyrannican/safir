@@ -1,7 +1,7 @@
 mod cli;
 
 use cli::*;
-use safir_core::{mem::SafirMemcache, utils, Safir, SafirEngineType};
+use safir_core::{utils, Safir, SafirEngineType};
 
 use anyhow::Result;
 use std::process::{Command, Stdio};
@@ -98,12 +98,7 @@ async fn main() -> Result<()> {
             }
         }
         Commands::Dump(args) => {
-            let inner = safir_mem
-                .engine
-                .to_type()
-                .downcast_ref::<SafirMemcache>()
-                .expect("unable to get inner reference");
-
+            let inner = safir_mem.as_safir_memcache();
             if let Err(e) = inner.dump_store(&args.path).await {
                 eprintln!("unable to dump Safir memcache service: {}", e);
             }

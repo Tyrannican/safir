@@ -34,9 +34,7 @@ pub fn check_process_running(pid: u32) -> bool {
 
 pub fn is_safir_running(pid: Option<u32>) -> bool {
     match pid {
-        Some(pid) => {
-            return check_process_running(pid);
-        }
+        Some(pid) => check_process_running(pid),
         None => false,
     }
 }

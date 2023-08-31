@@ -1,14 +1,14 @@
 mod cli;
 
+use anyhow::Result;
 use cli::*;
 
-use safir_core::{disk::Safir, utils};
+use safir_core::{Safir, SafirEngineType};
 
 #[tokio::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
     let cli = Cli::parse();
-    let store_dir = utils::create_safir_directory().await?;
-    let mut safir = Safir::init(&store_dir).await?;
+    let mut safir = Safir::new(SafirEngineType::Store).await?;
 
     match &cli.command {
         Commands::Add(args) => {
@@ -18,25 +18,27 @@ async fn main() -> std::io::Result<()> {
         }
         Commands::Get(args) => {
             if let Some(key) = &args.key {
-                safir.get_entry(key.clone())?;
+                safir.get_entry(key.clone()).await?;
             } else {
-                safir.display_all();
+                let inner = safir.as_safir_store();
+                inner.display_all();
             }
         }
         Commands::Rm(args) => {
             safir.remove_entry(args.key.clone()).await?;
         }
         Commands::Alias(args) => {
-            safir.set_commands("alias", &args.keys);
+            safir.set_commands("alias", &args.keys).await;
         }
         Commands::Export(args) => {
-            safir.set_commands("export", &args.keys);
+            safir.set_commands("export", &args.keys).await;
         }
         Commands::Clear => {
             safir.clear_entries().await?;
         }
         Commands::Purge => {
-            safir.purge();
+            let inner = safir.as_safir_store();
+            inner.purge();
         }
     }
 

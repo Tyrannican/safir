@@ -14,7 +14,7 @@ use async_trait::async_trait;
 use colored::*;
 
 use crate::config::SafirConfig;
-use crate::utils::{confirm_entry, init, print_header, print_output};
+use crate::utils::{confirm_entry, print_header, print_output};
 use crate::SafirEngine;
 use rubin::store::persistence::PersistentStore;
 
@@ -113,7 +113,7 @@ impl SafirStore {
     }
 
     /// Remove the store directory and all contents
-    pub fn purge(&mut self) {
+    pub fn purge(&self) {
         if confirm_entry("Are you sure you want to purge Safirstore?") {
             std::fs::remove_dir_all(&self.store.path)
                 .expect("unable to remove safirstore directory");
