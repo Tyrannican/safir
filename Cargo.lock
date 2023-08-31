@@ -721,6 +721,7 @@ dependencies = [
 name = "safir-mem"
 version = "0.2.0"
 dependencies = [
+ "anyhow",
  "clap",
  "safir-core",
  "tokio",

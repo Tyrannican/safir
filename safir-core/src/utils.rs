@@ -8,13 +8,10 @@ use colored::*;
 use sysinfo::{Pid, System, SystemExt};
 use tokio::fs;
 
-type SafirDirectory = (PathBuf, SafirConfig);
-
-pub async fn init() -> Result<SafirDirectory> {
+pub async fn init() -> Result<SafirConfig> {
     let store_dir = create_safir_directory().await?;
-    let safir_cfg = &store_dir.join("safir.cfg");
-    let cfg = load_safir_config(&safir_cfg).await?;
-    Ok((store_dir, cfg))
+    let cfg = load_safir_config(&store_dir).await?;
+    Ok(cfg)
 }
 
 pub fn check_rubin_installed() -> bool {
@@ -112,18 +109,22 @@ pub fn confirm_entry(msg: &str) -> bool {
     false
 }
 
-pub async fn load_safir_config(safir_cfg: impl AsRef<Path>) -> Result<SafirConfig> {
-    let mut cfg = if path_exists(&safir_cfg).await {
-        SafirConfig::load(&safir_cfg).await?
+pub async fn load_safir_config(store_dir: impl AsRef<Path>) -> Result<SafirConfig> {
+    let cfg_path = &store_dir.as_ref().join("safir.cfg");
+    let mut cfg = if path_exists(&cfg_path).await {
+        SafirConfig::load(&cfg_path).await?
     } else {
         SafirConfig::new()
     };
+
+    cfg.root_path = store_dir.as_ref().to_owned();
+    cfg.config_path = cfg_path.to_owned();
 
     // Used in cases where the process has ended ungracefully and the config hasnt been updated
     if let Some(pid) = cfg.memcache_pid {
         if !check_process_running(pid) {
             cfg = SafirConfig::new();
-            cfg.write(&safir_cfg).await?;
+            cfg.write().await?;
         }
     }
 

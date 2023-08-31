@@ -1,5 +1,6 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use config::SafirConfig;
 
 pub mod config;
 pub mod disk;
@@ -16,13 +17,34 @@ pub trait SafirEngine {
 }
 
 pub struct Safir {
-    engine: Box<dyn SafirEngine>,
+    pub engine: Box<dyn SafirEngine>,
+    pub config: SafirConfig,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum SafirEngineType {
+    Store,
+    Memcache,
 }
 
 impl Safir {
-    pub fn new<S: SafirEngine + 'static>(engine: S) -> Self {
-        Self {
-            engine: Box::new(engine),
+    pub async fn new(engine_type: SafirEngineType) -> Result<Self> {
+        let config = utils::init().await?;
+        match engine_type {
+            SafirEngineType::Store => {
+                let e = crate::disk::SafirStore::new(&config).await?;
+                return Ok(Self {
+                    engine: Box::new(e),
+                    config,
+                });
+            }
+            SafirEngineType::Memcache => {
+                let e = crate::mem::SafirMemcache::new(&config).await?;
+                return Ok(Self {
+                    engine: Box::new(e),
+                    config,
+                });
+            }
         }
     }
 

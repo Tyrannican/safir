@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use colored::*;
 
 use crate::config::SafirConfig;
-use crate::utils::{confirm_entry, init, print_header, print_output};
+use crate::utils::{self, confirm_entry, init, print_header, print_output};
 use crate::SafirEngine;
 use rubin::net::client::RubinClient;
 
@@ -17,7 +17,6 @@ fn safir_offline() {
 pub struct SafirMemcache {
     is_online: bool,
     client: RubinClient,
-    config: SafirConfig,
 }
 
 #[async_trait]
@@ -98,12 +97,10 @@ impl SafirEngine for SafirMemcache {
 }
 
 impl SafirMemcache {
-    pub async fn new(is_online: bool) -> Result<Self> {
-        let (_, cfg) = init().await?;
+    pub async fn new(cfg: &SafirConfig) -> Result<Self> {
         Ok(Self {
-            is_online,
+            is_online: utils::is_safir_running(cfg.memcache_pid),
             client: RubinClient::new("127.0.0.1", 9876),
-            config: cfg,
         })
     }
 

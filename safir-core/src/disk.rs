@@ -21,7 +21,6 @@ use rubin::store::persistence::PersistentStore;
 /// Safir Store (fancy wrapper around reading and writing to a JSON file)
 pub struct SafirStore {
     pub store: PersistentStore,
-    pub config: SafirConfig,
 }
 
 #[async_trait]
@@ -86,9 +85,8 @@ impl SafirEngine for SafirStore {
 
 impl SafirStore {
     /// Initialises the Safirstore if not already initialised
-    pub async fn new() -> Result<Self> {
-        let (store_loc, cfg) = init().await?;
-        let store_path = store_loc.join("safirstore.json");
+    pub async fn new(config: &SafirConfig) -> Result<Self> {
+        let store_path = config.root_path.join("safirstore.json");
         let mut ps = if store_path.exists() {
             PersistentStore::from_existing(store_path).await?
         } else {
@@ -96,10 +94,7 @@ impl SafirStore {
         };
 
         ps.set_write_on_update(true);
-        Ok(Self {
-            store: ps,
-            config: cfg,
-        })
+        Ok(Self { store: ps })
     }
 
     /// Display all key/values in the store
