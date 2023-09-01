@@ -1,9 +1,16 @@
 use serde::{Deserialize, Serialize};
-use std::{io::Result, path::Path};
+use std::{
+    io::Result,
+    path::{Path, PathBuf},
+};
 use tokio::{fs, io::AsyncWriteExt};
 
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct SafirConfig {
+    #[serde(skip)]
+    pub root_path: PathBuf,
+    #[serde(skip)]
+    pub config_path: PathBuf,
     pub memcache_pid: Option<u32>,
 }
 
@@ -17,9 +24,9 @@ impl SafirConfig {
         Ok(serde_json::from_str(&cfg).expect("unable to deserialize safir config"))
     }
 
-    pub async fn write(&self, cfg_path: impl AsRef<Path>) -> Result<()> {
+    pub async fn write(&self) -> Result<()> {
         let data = serde_json::to_string_pretty(&self).expect("unable to serialize safir config");
-        let mut file = fs::File::create(cfg_path).await?;
+        let mut file = fs::File::create(&self.config_path).await?;
         file.write_all(data.as_bytes()).await?;
 
         Ok(())

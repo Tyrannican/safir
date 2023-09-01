@@ -1,8 +1,11 @@
-use std::io::Result;
+use anyhow::Result;
 
+use async_trait::async_trait;
 use colored::*;
 
-use crate::utils::{confirm_entry, print_header, print_output};
+use crate::config::SafirConfig;
+use crate::utils::{self, confirm_entry, print_header, print_output};
+use crate::SafirEngine;
 use rubin::net::client::RubinClient;
 
 fn safir_offline() {
@@ -16,32 +19,26 @@ pub struct SafirMemcache {
     client: RubinClient,
 }
 
-impl SafirMemcache {
-    pub fn new(is_online: bool) -> Self {
-        Self {
-            is_online,
-            client: RubinClient::new("127.0.0.1", 9876),
-        }
-    }
-
-    pub async fn add_entry(&self, key: &str, value: &str) -> Result<()> {
+#[async_trait]
+impl SafirEngine for SafirMemcache {
+    async fn add_entry(&mut self, key: String, value: String) -> Result<()> {
         if !self.is_online {
             safir_offline();
             return Ok(());
         }
 
-        self.client.insert_string(key, value).await?;
+        self.client.insert_string(&key, &value).await?;
         Ok(())
     }
 
-    pub async fn get_string(&self, key: &str) -> Result<()> {
+    async fn get_entry(&self, key: String) -> Result<()> {
         if !self.is_online {
             safir_offline();
             return Ok(());
         }
 
         print_header();
-        let output = if let Ok(val) = self.client.get_string(key).await {
+        let output = if let Ok(val) = self.client.get_string(&key).await {
             format!("{}: \"{}\"", key.bold().yellow(), val)
         } else {
             format!("{}: ", key.bold().yellow())
@@ -52,7 +49,7 @@ impl SafirMemcache {
         Ok(())
     }
 
-    pub async fn remove_entry(&self, keys: Vec<String>) -> Result<()> {
+    async fn remove_entry(&mut self, keys: Vec<String>) -> Result<()> {
         if !self.is_online {
             safir_offline();
             return Ok(());
@@ -65,7 +62,7 @@ impl SafirMemcache {
         Ok(())
     }
 
-    pub async fn set_commands(&self, prefix: &str, keys: &Vec<String>) {
+    async fn set_commands(&mut self, prefix: &str, keys: &Vec<String>) {
         if !self.is_online {
             safir_offline();
             return;
@@ -85,7 +82,7 @@ impl SafirMemcache {
         }
     }
 
-    pub async fn clear_entries(&self) -> Result<()> {
+    async fn clear_entries(&mut self) -> Result<()> {
         if !self.is_online {
             safir_offline();
             return Ok(());
@@ -96,6 +93,19 @@ impl SafirMemcache {
         }
 
         Ok(())
+    }
+
+    fn to_type(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl SafirMemcache {
+    pub async fn new(cfg: &SafirConfig) -> Result<Self> {
+        Ok(Self {
+            is_online: utils::is_safir_running(cfg.memcache_pid),
+            client: RubinClient::new("127.0.0.1", 9876),
+        })
     }
 
     pub async fn dump_store(&self, path: &str) -> Result<()> {
