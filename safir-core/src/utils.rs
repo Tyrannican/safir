@@ -100,7 +100,7 @@ pub fn confirm_entry(msg: &str) -> bool {
         .expect("unable to get input from user");
 
     let answer = answer.trim().to_lowercase();
-    if answer == "y" {
+    if answer == "y" || answer == "yes" {
         return true;
     }
 

@@ -1,15 +1,21 @@
-use anyhow::Result;
-use async_trait::async_trait;
-use config::SafirConfig;
-use disk::SafirStore;
-use mem::SafirMemcache;
-
 pub mod config;
 pub mod disk;
 pub mod mem;
 pub mod utils;
 
+use anyhow::Result;
+use async_trait::async_trait;
 use std::any::Any;
+
+use config::SafirConfig;
+use disk::SafirStore;
+use mem::SafirMemcache;
+
+#[derive(Debug, PartialEq)]
+pub enum SafirEngineType {
+    Store,
+    Memcache,
+}
 
 #[async_trait]
 pub trait SafirEngine {
@@ -24,12 +30,6 @@ pub trait SafirEngine {
 pub struct Safir {
     pub engine: Box<dyn SafirEngine>,
     pub config: SafirConfig,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum SafirEngineType {
-    Store,
-    Memcache,
 }
 
 impl Safir {
