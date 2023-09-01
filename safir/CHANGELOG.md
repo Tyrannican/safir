@@ -2,6 +2,14 @@
 
 Documenting changes between versions beginning from v0.3.0
 
+## v0.7.1
+
+Changes to the internal code structure, no changes to operation
+
+## v0.7.0
+
+Something happened here but not major...
+
 ## v0.6.0
 
 Removed the Safir Memcache and moved it to its own project.

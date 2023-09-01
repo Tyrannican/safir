@@ -1,6 +1,6 @@
 [package]
 name = "safir-core"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Internal lib used to build Safir and Safir-mem"
 authors = ["Graham Keenan graham.keenan@outlook.com"]

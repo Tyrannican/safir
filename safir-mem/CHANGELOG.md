@@ -2,6 +2,10 @@
 
 Documenting changes between versions 
 
+## v0.2.1
+
+Changes to the internal code structure, no changes to operation
+
 ## v0.2.0
 
 Moved the core of the control to a new internal library called `safir-core`
