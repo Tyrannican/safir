@@ -19,6 +19,27 @@ pub struct SafirMemcache {
     client: RubinClient,
 }
 
+impl SafirMemcache {
+    pub async fn new(cfg: &SafirConfig) -> Result<Self> {
+        Ok(Self {
+            is_online: utils::is_safir_running(cfg.memcache_pid),
+            client: RubinClient::new("127.0.0.1", 9876),
+        })
+    }
+
+    pub async fn dump_store(&self, path: &str) -> Result<()> {
+        if !self.is_online {
+            safir_offline();
+            return Ok(());
+        }
+
+        self.client.dump_store(path).await?;
+        println!("Safir memcache dumped to {}", path);
+
+        Ok(())
+    }
+}
+
 #[async_trait]
 impl SafirEngine for SafirMemcache {
     async fn add_entry(&mut self, key: String, value: String) -> Result<()> {
@@ -97,26 +118,5 @@ impl SafirEngine for SafirMemcache {
 
     fn to_type(&self) -> &dyn std::any::Any {
         self
-    }
-}
-
-impl SafirMemcache {
-    pub async fn new(cfg: &SafirConfig) -> Result<Self> {
-        Ok(Self {
-            is_online: utils::is_safir_running(cfg.memcache_pid),
-            client: RubinClient::new("127.0.0.1", 9876),
-        })
-    }
-
-    pub async fn dump_store(&self, path: &str) -> Result<()> {
-        if !self.is_online {
-            safir_offline();
-            return Ok(());
-        }
-
-        self.client.dump_store(path).await?;
-        println!("Safir memcache dumped to {}", path);
-
-        Ok(())
     }
 }

@@ -40,6 +40,18 @@ async fn main() -> Result<()> {
             let inner = safir.as_safir_store();
             inner.purge();
         }
+        Commands::Headless(mode) => match mode {
+            HeadlessFlags::On => {
+                safir.config.headless_mode = Some(true);
+                safir.config.write().await?;
+                println!("Headless mode is ON");
+            }
+            HeadlessFlags::Off => {
+                safir.config.headless_mode = Some(false);
+                safir.config.write().await?;
+                println!("Headless mode is OFF");
+            }
+        },
     }
 
     Ok(())
