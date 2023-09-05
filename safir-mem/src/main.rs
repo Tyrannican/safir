@@ -21,8 +21,7 @@ async fn main() -> Result<()> {
             if let Some(key) = &args.key {
                 safir_mem.get_entry(key.to_string()).await?;
             } else {
-                utils::print_header();
-                utils::print_output("A key is required for memcache GET command!");
+                println!("A key is required for memcache GET command!");
             }
         }
         Commands::Rm(args) => {
