@@ -44,10 +44,22 @@ impl SafirStore {
     }
 
     pub fn print_headless(&self, prefix: &str, key: &str, value: &str) {
-        if !prefix.is_empty() {
-            println!("{} {}=\"{}\"", prefix, key, value);
+        if value == "" {
+            return;
+        }
+
+        let has_whitespace = value.contains(char::is_whitespace);
+
+        let output = if has_whitespace {
+            format!("{}=\"{}\"", key, value)
         } else {
-            println!("{}={}", key, value);
+            format!("{}={}", key, value)
+        };
+
+        if !prefix.is_empty() {
+            println!("{} {}", prefix, output);
+        } else {
+            println!("{}", output);
         }
     }
 
@@ -96,7 +108,7 @@ impl SafirEngine for SafirStore {
         };
 
         if self.headless {
-            println!("{value}");
+            self.print_headless("", &key, &value);
             return Ok(());
         }
 
