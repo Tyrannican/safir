@@ -14,7 +14,7 @@ use async_trait::async_trait;
 use colored::*;
 
 use crate::config::SafirConfig;
-use crate::utils::{confirm_entry, print_header, print_output};
+use crate::utils::{confirm_entry, print_header, print_headless, print_output};
 use crate::SafirEngine;
 use rubin::store::persistence::PersistentStore;
 
@@ -43,32 +43,12 @@ impl SafirStore {
         })
     }
 
-    pub fn print_headless(&self, prefix: &str, key: &str, value: &str) {
-        if value == "" {
-            return;
-        }
-
-        let has_whitespace = value.contains(char::is_whitespace);
-
-        let output = if has_whitespace {
-            format!("{}=\"{}\"", key, value)
-        } else {
-            format!("{}={}", key, value)
-        };
-
-        if !prefix.is_empty() {
-            println!("{} {}", prefix, output);
-        } else {
-            println!("{}", output);
-        }
-    }
-
     /// Display all key/values in the store
     pub fn display_all(&self) {
         let strings = self.store.get_string_store_ref();
         if self.headless {
             for (key, value) in strings.iter() {
-                self.print_headless("", key, value);
+                print_headless("", key, value);
             }
 
             return;
@@ -108,7 +88,7 @@ impl SafirEngine for SafirStore {
         };
 
         if self.headless {
-            self.print_headless("", &key, &value);
+            print_headless("", &key, &value);
             return Ok(());
         }
 
@@ -141,7 +121,7 @@ impl SafirEngine for SafirStore {
         if self.headless {
             for key in keys {
                 if let Ok(value) = self.store.get_string(key) {
-                    self.print_headless(prefix, key, &value);
+                    print_headless(prefix, key, &value);
                 }
             }
 
