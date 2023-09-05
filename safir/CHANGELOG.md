@@ -2,6 +2,16 @@
 
 Documenting changes between versions beginning from v0.3.0
 
+## v0.8.0
+
+Headless mode!
+
+You can now run safir in "headless" mode which removes all the fancy formatting for output
+
+This will allow you to evaluate safir output directly in the terminal.
+
+This also persist as a config setting saved to `~/.safirstore/safir.cfg`
+
 ## v0.7.1
 
 Changes to the internal code structure, no changes to operation
