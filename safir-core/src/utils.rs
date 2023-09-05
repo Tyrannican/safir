@@ -89,6 +89,26 @@ pub fn print_header() {
     println!("{}", "--=Safirstore=--\n".bold());
 }
 
+pub fn print_headless(prefix: &str, key: &str, value: &str) {
+    if value == "" {
+        return;
+    }
+
+    let has_whitespace = value.contains(char::is_whitespace);
+
+    let output = if has_whitespace {
+        format!("{}=\"{}\"", key, value)
+    } else {
+        format!("{}={}", key, value)
+    };
+
+    if !prefix.is_empty() {
+        println!("{} {}", prefix, output);
+    } else {
+        println!("{}", output);
+    }
+}
+
 /// Confirmation dialog for important calls
 pub fn confirm_entry(msg: &str) -> bool {
     let mut answer = String::new();

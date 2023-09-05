@@ -1,10 +1,9 @@
 use anyhow::Result;
 
 use async_trait::async_trait;
-use colored::*;
 
 use crate::config::SafirConfig;
-use crate::utils::{self, confirm_entry, print_header, print_output};
+use crate::utils::{self, confirm_entry, print_headless};
 use crate::SafirEngine;
 use rubin::net::client::RubinClient;
 
@@ -17,6 +16,27 @@ fn safir_offline() {
 pub struct SafirMemcache {
     is_online: bool,
     client: RubinClient,
+}
+
+impl SafirMemcache {
+    pub async fn new(cfg: &SafirConfig) -> Result<Self> {
+        Ok(Self {
+            is_online: utils::is_safir_running(cfg.memcache_pid),
+            client: RubinClient::new("127.0.0.1", 9876),
+        })
+    }
+
+    pub async fn dump_store(&self, path: &str) -> Result<()> {
+        if !self.is_online {
+            safir_offline();
+            return Ok(());
+        }
+
+        self.client.dump_store(path).await?;
+        println!("Safir memcache dumped to {}", path);
+
+        Ok(())
+    }
 }
 
 #[async_trait]
@@ -37,14 +57,13 @@ impl SafirEngine for SafirMemcache {
             return Ok(());
         }
 
-        print_header();
-        let output = if let Ok(val) = self.client.get_string(&key).await {
-            format!("{}: \"{}\"", key.bold().yellow(), val)
+        let value = if let Ok(val) = self.client.get_string(&key).await {
+            val
         } else {
-            format!("{}: ", key.bold().yellow())
+            String::from("")
         };
 
-        print_output(&output);
+        print_headless("", &key, &value);
 
         Ok(())
     }
@@ -68,16 +87,9 @@ impl SafirEngine for SafirMemcache {
             return;
         }
 
-        print_header();
-        let prefix = match prefix {
-            "alias" => "alias".bold().green(),
-            "export" => "export".bold().magenta(),
-            _ => prefix.bold(),
-        };
-
         for key in keys {
             if let Ok(value) = self.client.get_string(key).await {
-                println!("{} {}=\"{}\"\n", prefix, key.bold().yellow(), value);
+                print_headless(prefix, key, &value);
             }
         }
     }
@@ -97,26 +109,5 @@ impl SafirEngine for SafirMemcache {
 
     fn to_type(&self) -> &dyn std::any::Any {
         self
-    }
-}
-
-impl SafirMemcache {
-    pub async fn new(cfg: &SafirConfig) -> Result<Self> {
-        Ok(Self {
-            is_online: utils::is_safir_running(cfg.memcache_pid),
-            client: RubinClient::new("127.0.0.1", 9876),
-        })
-    }
-
-    pub async fn dump_store(&self, path: &str) -> Result<()> {
-        if !self.is_online {
-            safir_offline();
-            return Ok(());
-        }
-
-        self.client.dump_store(path).await?;
-        println!("Safir memcache dumped to {}", path);
-
-        Ok(())
     }
 }

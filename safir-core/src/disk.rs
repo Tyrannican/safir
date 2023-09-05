@@ -14,13 +14,61 @@ use async_trait::async_trait;
 use colored::*;
 
 use crate::config::SafirConfig;
-use crate::utils::{confirm_entry, print_header, print_output};
+use crate::utils::{confirm_entry, print_header, print_headless, print_output};
 use crate::SafirEngine;
 use rubin::store::persistence::PersistentStore;
 
 /// Safir Store (fancy wrapper around reading and writing to a JSON file)
 pub struct SafirStore {
     pub store: PersistentStore,
+    pub headless: bool,
+}
+
+impl SafirStore {
+    /// Initialises the Safirstore if not already initialised
+    pub async fn new(config: &SafirConfig) -> Result<Self> {
+        let store_path = config.root_path.join("safirstore.json");
+        let mut ps = if store_path.exists() {
+            PersistentStore::from_existing(store_path).await?
+        } else {
+            PersistentStore::new(store_path).await?
+        };
+
+        ps.set_write_on_update(true);
+        let headless = config.get_headless_mode();
+
+        Ok(Self {
+            store: ps,
+            headless,
+        })
+    }
+
+    /// Display all key/values in the store
+    pub fn display_all(&self) {
+        let strings = self.store.get_string_store_ref();
+        if self.headless {
+            for (key, value) in strings.iter() {
+                print_headless("", key, value);
+            }
+
+            return;
+        }
+
+        print_header();
+        let mut output: String;
+        for (key, value) in strings.iter() {
+            output = format!("{}: \"{}\"", key.bold().yellow(), value);
+            print_output(&output);
+        }
+    }
+
+    /// Remove the store directory and all contents
+    pub fn purge(&self) {
+        if confirm_entry("Are you sure you want to purge Safirstore?") {
+            std::fs::remove_dir_all(&self.store.path)
+                .expect("unable to remove safirstore directory");
+        }
+    }
 }
 
 #[async_trait]
@@ -33,9 +81,20 @@ impl SafirEngine for SafirStore {
 
     /// Get an entry form the store by loading it from disk and displaying it
     async fn get_entry(&self, key: String) -> Result<()> {
+        let value = if let Ok(val) = self.store.get_string(&key) {
+            val
+        } else {
+            String::from("")
+        };
+
+        if self.headless {
+            print_headless("", &key, &value);
+            return Ok(());
+        }
+
         print_header();
-        let output = if let Ok(val) = self.store.get_string(&key) {
-            format!("{}: \"{}\"", key.bold().yellow(), val)
+        let output = if !value.is_empty() {
+            format!("{}: \"{}\"", key.bold().yellow(), value)
         } else {
             format!("{}: ", key.bold().yellow())
         };
@@ -59,13 +118,22 @@ impl SafirEngine for SafirStore {
     /// E.g. With a prefix of `alias` this will display the command as
     /// `alias {key}="{value}"` with {key} / {value} replaced with their values from the store
     async fn set_commands(&mut self, prefix: &str, keys: &Vec<String>) {
+        if self.headless {
+            for key in keys {
+                if let Ok(value) = self.store.get_string(key) {
+                    print_headless(prefix, key, &value);
+                }
+            }
+
+            return;
+        }
+
         print_header();
         let prefix = match prefix {
             "alias" => "alias".bold().green(),
             "export" => "export".bold().magenta(),
             _ => prefix.bold(),
         };
-
         for key in keys {
             if let Ok(value) = self.store.get_string(key) {
                 println!("{} {}=\"{}\"\n", prefix, key.bold().yellow(), value);
@@ -84,39 +152,5 @@ impl SafirEngine for SafirStore {
 
     fn to_type(&self) -> &dyn std::any::Any {
         self
-    }
-}
-
-impl SafirStore {
-    /// Initialises the Safirstore if not already initialised
-    pub async fn new(config: &SafirConfig) -> Result<Self> {
-        let store_path = config.root_path.join("safirstore.json");
-        let mut ps = if store_path.exists() {
-            PersistentStore::from_existing(store_path).await?
-        } else {
-            PersistentStore::new(store_path).await?
-        };
-
-        ps.set_write_on_update(true);
-        Ok(Self { store: ps })
-    }
-
-    /// Display all key/values in the store
-    pub fn display_all(&self) {
-        print_header();
-        let mut output: String;
-        let strings = self.store.get_string_store_ref();
-        for (key, value) in strings.iter() {
-            output = format!("{}: \"{}\"", key.bold().yellow(), value);
-            print_output(&output);
-        }
-    }
-
-    /// Remove the store directory and all contents
-    pub fn purge(&self) {
-        if confirm_entry("Are you sure you want to purge Safirstore?") {
-            std::fs::remove_dir_all(&self.store.path)
-                .expect("unable to remove safirstore directory");
-        }
     }
 }
