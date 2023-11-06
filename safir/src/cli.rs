@@ -30,15 +30,14 @@ pub enum Commands {
     /// Output the export command for a key / value pair to be entered into a shell session
     Export(SetArgs),
 
+    /// List all values in the store
+    List,
+
     /// Clear all keys/values from the store
     Clear,
 
     /// Purges the .safirstore directory, removing it and its contents
     Purge,
-
-    /// Set the headless mode
-    #[clap(subcommand)]
-    Headless(HeadlessFlags),
 }
 
 /// Arguments for adding a value to the store with a given key
@@ -74,13 +73,4 @@ pub struct RemoveArgs {
 pub struct SetArgs {
     /// Name of the keys to display (e.g. alias / export)
     pub keys: Vec<String>,
-}
-
-#[derive(Subcommand, Debug)]
-pub enum HeadlessFlags {
-    /// Set headless mode ON
-    On,
-
-    /// Set headless mode OFF
-    Off,
 }
