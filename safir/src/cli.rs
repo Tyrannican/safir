@@ -18,16 +18,16 @@ pub enum Commands {
     /// Add a value to the store with the given key
     Add(AddArgs),
 
-    /// Get a value from the store
+    /// Get values from the store
     Get(GetArgs),
 
     /// Remove values from the store
     Rm(RemoveArgs),
 
-    /// Output the alias command for a key / value pair to be entered into a shell session
+    /// Output the alias command for  key / value pairs 
     Alias(SetArgs),
 
-    /// Output the export command for a key / value pair to be entered into a shell session
+    /// Output the export command for a key / value pairs 
     Export(SetArgs),
 
     /// List all values in the store
@@ -50,10 +50,10 @@ pub struct AddArgs {
     pub value: String,
 }
 
-/// Arguments for retrieving a value from the store with a given key
+/// Arguments for retrieving values from the store with the given keys
 #[derive(Args, Debug)]
 pub struct GetArgs {
-    /// Name of the value to retrieve from the store
+    /// Keys to retrieve the values for
     ///
     /// Returns nothing if the key does not exist
     pub keys: Vec<String>,

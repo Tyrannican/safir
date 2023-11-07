@@ -2,6 +2,31 @@
 
 Documenting changes between versions beginning from v0.3.0
 
+## v0.9.0
+
+** THIS IS A BREAKING CHANGE **
+
+The entire `safir` project has been overhauled and brought back to it's original (and simple) purpose: display Key-value pairs.
+
+When working on the whole project, it became clear to me that it was growing _way_ out of control.
+Initially it was to be an in-memory version (similar to Redis) but an on-disk storage solution was developed first.
+The in-memory version spawned a whole load of side-projects (`rubin` for one) but in doing so, it became an over-engineered beast.
+
+At it's heart, `safir` was simply meant to be a small program to store key-value pairs and retrieve them later - that's it!
+So when I rewrote it in Go for fun, I realised that it was far too complex and could just be a simple command-line tool with simple commands.
+
+So here we are, it's back to it's original "mindset" and is now _far_ simpler, just storing KV pairs on disk.
+No additional libraries, no in-memory versions; just a simple KV store.
+
+The other versions are still available but are no longer maintained and this will be the "final" form going forward.
+
+Sorry for any inconvenience and hope you enjoy the more simpler version!
+
+* Overhauled project to be simpler with no crazy, custom-built backend solutions
+* No pretty output, just displays the KV in the format `[key]="[value]"`
+* No configs, just a JSON file stored at `$HOME/.safirstore/safirstore.json`
+* All previous commands still work as they did before (minus the additional ones for in-memory storage)
+
 ## v0.8.0
 
 Headless mode!

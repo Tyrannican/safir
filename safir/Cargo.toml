@@ -11,8 +11,6 @@ repository = "https://github.com/Tyrannican/safir"
 keywords = ["cli", "terminal", "utility", "key-value", "store"]
 categories = ["command-line-utilities"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 clap = { version = "4.2.5" , features = ["derive"] }
 anyhow = "1.0.75"
