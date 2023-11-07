@@ -4,7 +4,7 @@ Documenting changes between versions beginning from v0.3.0
 
 ## v0.9.0
 
-** THIS IS A BREAKING CHANGE **
+**THIS IS A BREAKING CHANGE**
 
 The entire `safir` project has been overhauled and brought back to it's original (and simple) purpose: display Key-value pairs.
 
