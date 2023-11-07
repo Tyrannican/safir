@@ -52,8 +52,6 @@ impl Store {
         for key in keys.iter() {
             if let Some(value) = self.store.get(key) {
                 utils::display_kv(key, value);
-            } else {
-                println!("No key - {key}");
             }
         }
     }
@@ -71,16 +69,15 @@ impl Store {
                 if utils::confirm_entry(&confirm_msg) {
                     self.store.remove(key);
                 }
-            } else {
-                println!("No key - {key}");
             }
         }
     }
 
     pub fn custom_display(&self, display_cmd: &str, keys: Vec<String>) {
         for key in keys.iter() {
-            let value = &self.store[key];
-            println!("{display_cmd} {key}=\"{value}\"");
+            if let Some(value) = self.store.get(key) {
+                println!("{display_cmd} {key}=\"{value}\"");
+            }
         }
     }
 
