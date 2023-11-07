@@ -18,6 +18,10 @@ pub fn confirm_entry(msg: &str) -> bool {
     false
 }
 
+pub fn display_kv(key: &str, value: &str) {
+    println!("{key}=\"{value}\"")
+}
+
 pub fn load_store(path: impl AsRef<Path>) -> HashMap<String, String> {
     let contents = std::fs::read_to_string(path.as_ref())
         .expect("unable to store contents");
@@ -35,4 +39,9 @@ pub fn write_store(store: &HashMap<String, String>, path: impl AsRef<Path>) {
 
     file.write_all(str_store.as_bytes())
         .expect("unable to write store out to disk");
+}
+
+pub fn purge_directory(path: impl AsRef<Path>) {
+    std::fs::remove_dir_all(path)
+        .expect("unable to remove safirstore directory");
 }

@@ -56,7 +56,7 @@ pub struct GetArgs {
     /// Name of the value to retrieve from the store
     ///
     /// Returns nothing if the key does not exist
-    pub key: Option<String>,
+    pub keys: Vec<String>,
 }
 
 /// Arguments for removing values from the store with given keys
@@ -65,7 +65,7 @@ pub struct RemoveArgs {
     /// Name of the keys to remove from the store
     ///
     /// Does nothing if the keys do not exist
-    pub key: Vec<String>,
+    pub keys: Vec<String>,
 }
 
 /// Arguments for outputting commands with a given prefix
