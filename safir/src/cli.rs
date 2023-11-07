@@ -18,27 +18,26 @@ pub enum Commands {
     /// Add a value to the store with the given key
     Add(AddArgs),
 
-    /// Get a value from the store
+    /// Get values from the store
     Get(GetArgs),
 
     /// Remove values from the store
     Rm(RemoveArgs),
 
-    /// Output the alias command for a key / value pair to be entered into a shell session
+    /// Output the alias command for  key / value pairs 
     Alias(SetArgs),
 
-    /// Output the export command for a key / value pair to be entered into a shell session
+    /// Output the export command for a key / value pairs 
     Export(SetArgs),
+
+    /// List all values in the store
+    List,
 
     /// Clear all keys/values from the store
     Clear,
 
     /// Purges the .safirstore directory, removing it and its contents
     Purge,
-
-    /// Set the headless mode
-    #[clap(subcommand)]
-    Headless(HeadlessFlags),
 }
 
 /// Arguments for adding a value to the store with a given key
@@ -51,13 +50,13 @@ pub struct AddArgs {
     pub value: String,
 }
 
-/// Arguments for retrieving a value from the store with a given key
+/// Arguments for retrieving values from the store with the given keys
 #[derive(Args, Debug)]
 pub struct GetArgs {
-    /// Name of the value to retrieve from the store
+    /// Keys to retrieve the values for
     ///
     /// Returns nothing if the key does not exist
-    pub key: Option<String>,
+    pub keys: Vec<String>,
 }
 
 /// Arguments for removing values from the store with given keys
@@ -66,7 +65,7 @@ pub struct RemoveArgs {
     /// Name of the keys to remove from the store
     ///
     /// Does nothing if the keys do not exist
-    pub key: Vec<String>,
+    pub keys: Vec<String>,
 }
 
 /// Arguments for outputting commands with a given prefix
@@ -74,13 +73,4 @@ pub struct RemoveArgs {
 pub struct SetArgs {
     /// Name of the keys to display (e.g. alias / export)
     pub keys: Vec<String>,
-}
-
-#[derive(Subcommand, Debug)]
-pub enum HeadlessFlags {
-    /// Set headless mode ON
-    On,
-
-    /// Set headless mode OFF
-    Off,
 }

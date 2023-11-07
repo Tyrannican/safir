@@ -1,58 +1,44 @@
 mod cli;
+mod utils;
+mod store;
+
+use cli::*;
+use store::Store;
 
 use anyhow::Result;
-use cli::*;
 
-use safir_core::{Safir, SafirEngineType};
 
-#[tokio::main]
-async fn main() -> Result<()> {
+fn main() -> Result<()> {
     let cli = Cli::parse();
-    let mut safir = Safir::new(SafirEngineType::Store).await?;
+    let mut safir = Store::init_safir();
 
     match &cli.command {
         Commands::Add(args) => {
-            safir
-                .add_entry(args.key.clone(), args.value.clone())
-                .await?;
+            safir.add(args.key.to_owned(), args.value.to_owned());
         }
         Commands::Get(args) => {
-            if let Some(key) = &args.key {
-                safir.get_entry(key.clone()).await?;
-            } else {
-                let inner = safir.as_safir_store();
-                inner.display_all();
-            }
+            safir.get(args.keys.to_owned());
         }
         Commands::Rm(args) => {
-            safir.remove_entry(args.key.clone()).await?;
+            safir.remove(args.keys.to_owned());
         }
         Commands::Alias(args) => {
-            safir.set_commands("alias", &args.keys).await;
+            safir.custom_display("alias", args.keys.to_owned());
         }
         Commands::Export(args) => {
-            safir.set_commands("export", &args.keys).await;
+            safir.custom_display("export", args.keys.to_owned());
+        }
+        Commands::List => {
+            safir.list();
         }
         Commands::Clear => {
-            safir.clear_entries().await?;
+            safir.clear();
         }
         Commands::Purge => {
-            let inner = safir.as_safir_store();
-            inner.purge();
+            safir.purge();
         }
-        Commands::Headless(mode) => match mode {
-            HeadlessFlags::On => {
-                safir.config.headless_mode = Some(true);
-                safir.config.write().await?;
-                println!("Headless mode is ON");
-            }
-            HeadlessFlags::Off => {
-                safir.config.headless_mode = Some(false);
-                safir.config.write().await?;
-                println!("Headless mode is OFF");
-            }
-        },
     }
 
+    utils::write_store(&safir.store, &safir.file);
     Ok(())
 }
