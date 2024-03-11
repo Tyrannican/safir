@@ -79,7 +79,7 @@ Exporting a value:
 safir export api_key
 # export api_key="api_key_value"
 
-$(safir export api_key) # <-- Will export the value to the current shell
+eval $(safir export api_key) # <-- Will export the value to the current shell
 ```
 
 Aliasing a value:
@@ -88,7 +88,7 @@ Aliasing a value:
 safir alias long_command
 # alias long_command="cd build/ && make && sudo make install"
 
-$(safir alias long_command) # <-- Will alias the command in the current shell
+eval $(safir alias long_command) # <-- Will alias the command in the current shell
 ```
 
 Clear the store:
