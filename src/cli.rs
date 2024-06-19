@@ -16,7 +16,7 @@ pub struct Cli {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Add a value to the store with the given key
-    Add(AddArgs),
+    Add { key: String, value: String },
 
     /// Get values from the store
     Get(GetArgs),
@@ -24,10 +24,10 @@ pub enum Commands {
     /// Remove values from the store
     Rm(RemoveArgs),
 
-    /// Output the alias command for  key / value pairs 
+    /// Output the alias command for  key / value pairs
     Alias(SetArgs),
 
-    /// Output the export command for a key / value pairs 
+    /// Output the export command for a key / value pairs
     Export(SetArgs),
 
     /// List all values in the store
@@ -38,16 +38,6 @@ pub enum Commands {
 
     /// Purges the .safirstore directory, removing it and its contents
     Purge,
-}
-
-/// Arguments for adding a value to the store with a given key
-#[derive(Args, Debug)]
-pub struct AddArgs {
-    /// Name of the item to store
-    pub key: String,
-
-    /// Value to store
-    pub value: String,
 }
 
 /// Arguments for retrieving values from the store with the given keys

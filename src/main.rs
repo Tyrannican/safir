@@ -1,20 +1,19 @@
 mod cli;
-mod utils;
 mod store;
+mod utils;
 
 use cli::*;
 use store::Store;
 
 use anyhow::Result;
 
-
 fn main() -> Result<()> {
     let cli = Cli::parse();
     let mut safir = Store::init_safir();
 
     match &cli.command {
-        Commands::Add(args) => {
-            safir.add(args.key.to_owned(), args.value.to_owned());
+        Commands::Add { key, value } => {
+            safir.add(key.to_owned(), value.to_owned());
         }
         Commands::Get(args) => {
             safir.get(args.keys.to_owned());
