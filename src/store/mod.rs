@@ -1,11 +1,13 @@
+pub mod db_store;
 pub mod file_store;
 
 use crate::utils;
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 use clap::ValueEnum;
+use db_store::SqliteStore;
 use file_store::KVStore;
 use serde::{Deserialize, Serialize};
 
@@ -42,18 +44,12 @@ impl SafirConfig {
     }
 }
 
-pub fn init_safir() -> Result<impl SafirStore> {
-    // 1. Create .safirstore dir
+pub async fn init_safir() -> Result<impl SafirStore> {
     let ws = utils::create_safir_workspace();
-
-    // 2. Load / Create config
     let cfg = SafirConfig::load(&ws).expect("can't load safir config");
 
-    // 3. Load / Create stores
-    let store = match cfg.mode {
-        SafirMode::File => KVStore::load(ws),
-        _ => unimplemented!("not yet on db work"),
-    };
-
-    Ok(store)
+    match cfg.mode {
+        SafirMode::File => Ok(KVStore::load(ws)),
+        SafirMode::Database => unimplemented!("fix this"),
+    }
 }

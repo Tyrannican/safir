@@ -18,7 +18,10 @@ impl KVStore {
             store
         };
 
-        Self { path: ws, store }
+        Self {
+            path: store_path,
+            store,
+        }
     }
 
     pub fn custom_display(&self, display_cmd: &str, keys: Vec<String>) {

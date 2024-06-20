@@ -10,7 +10,7 @@ use anyhow::{Context, Result};
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
-    let mut safir = store::init_safir().context("loading safir store")?;
+    let mut safir = store::init_safir().await.context("loading safir store")?;
 
     match cli.command {
         Commands::Add { key, value } => {
@@ -24,9 +24,11 @@ async fn main() -> Result<()> {
         }
         Commands::Alias { keys } => {
             // TODO: Fix custom displays
+            unimplemented!("alias needs work");
             // safir.custom_display("alias", keys.to_owned()).await?;
         }
         Commands::Export { keys } => {
+            unimplemented!("export needs work");
             // safir.custom_display("export", keys.to_owned()).await?;
         }
         Commands::List => {
