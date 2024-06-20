@@ -1,5 +1,6 @@
 //! CLI for using the Safir binary
-pub use clap::{Args, Parser, Subcommand};
+use crate::store::SafirMode;
+pub use clap::{Parser, Subcommand};
 
 /// CLI arguments for running the program
 #[derive(Parser, Debug)]
@@ -47,6 +48,9 @@ pub enum Commands {
         /// Keys to export the values
         keys: Vec<String>,
     },
+
+    /// Sets the mode for Safir (KV-file store or SQLite store - active on next run)
+    Mode { mode: SafirMode },
 
     /// List all values in the store
     List,

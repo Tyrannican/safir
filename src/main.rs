@@ -3,15 +3,13 @@ mod store;
 mod utils;
 
 use cli::*;
-use store::Store;
 
 use anyhow::Result;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-    let mut safir = Store::init_safir();
 
-    match &cli.command {
+    match cli.command {
         Commands::Add { key, value } => {
             // safir.add(key.to_owned(), value.to_owned());
         }
@@ -36,8 +34,11 @@ fn main() -> Result<()> {
         Commands::Purge => {
             // safir.purge();
         }
+        Commands::Mode { mode } => {
+            println!("Mode: {mode:?}");
+        }
     }
 
-    utils::write_store(&safir.store, &safir.file);
+    // utils::write_store(&safir.store, &safir.file);
     Ok(())
 }

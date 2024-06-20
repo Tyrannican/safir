@@ -1,21 +1,20 @@
 use crate::utils;
-use std::{fs, path::PathBuf, collections::HashMap};
+use std::{collections::HashMap, fs, path::PathBuf};
 
-pub struct Store {
+pub struct KVStore {
     pub path: PathBuf,
     pub file: PathBuf,
-    pub store: HashMap<String, String>
+    pub store: HashMap<String, String>,
 }
 
-impl Store {
+impl KVStore {
     pub fn init_safir() -> Self {
         match dirs::home_dir() {
             Some(home) => {
                 let working_dir = home.join(".safirstore");
-                fs::create_dir_all(&working_dir)
-                    .expect("unable to create main directory");
+                fs::create_dir_all(&working_dir).expect("unable to create main directory");
 
-                let store_path = working_dir.join("safirstore.json"); 
+                let store_path = working_dir.join("safirstore.json");
                 let store = if store_path.exists() {
                     utils::load_store(&store_path)
                 } else {
@@ -89,7 +88,8 @@ impl Store {
     }
 
     pub fn purge(&mut self) {
-        let confirm_msg = "Are you sure you want to remove the .safirstore directory and ALL contents?";
+        let confirm_msg =
+            "Are you sure you want to remove the .safirstore directory and ALL contents?";
         if utils::confirm_entry(&confirm_msg) {
             utils::purge_directory(self.path.clone());
             std::process::exit(0);
