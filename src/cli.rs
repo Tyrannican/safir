@@ -49,8 +49,11 @@ pub enum Commands {
         keys: Vec<String>,
     },
 
-    /// Sets the mode for Safir (KV-file store or SQLite store - active on next run)
-    Mode { mode: SafirMode },
+    /// Sets the mode for Safir (active on the next run of Safir)
+    Mode {
+        /// Mode to set (KV-file store or SQLite DB store)
+        mode: SafirMode,
+    },
 
     /// List all values in the store
     List,

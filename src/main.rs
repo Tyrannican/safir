@@ -3,36 +3,40 @@ mod store;
 mod utils;
 
 use cli::*;
+use store::SafirStore;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let cli = Cli::parse();
+    let mut safir = store::init_safir().context("loading safir store")?;
 
     match cli.command {
         Commands::Add { key, value } => {
-            // safir.add(key.to_owned(), value.to_owned());
+            safir.add(key.to_owned(), value.to_owned()).await?;
         }
         Commands::Get { keys } => {
-            // safir.get(args.keys.to_owned());
+            safir.get(keys.to_owned()).await?;
         }
         Commands::Rm { keys } => {
-            // safir.remove(args.keys.to_owned());
+            safir.remove(keys.to_owned()).await?;
         }
         Commands::Alias { keys } => {
-            // safir.custom_display("alias", args.keys.to_owned());
+            // TODO: Fix custom displays
+            // safir.custom_display("alias", keys.to_owned()).await?;
         }
         Commands::Export { keys } => {
-            // safir.custom_display("export", args.keys.to_owned());
+            // safir.custom_display("export", keys.to_owned()).await?;
         }
         Commands::List => {
-            // safir.list();
+            safir.list().await?;
         }
         Commands::Clear => {
-            // safir.clear();
+            safir.clear().await?;
         }
         Commands::Purge => {
-            // safir.purge();
+            safir.purge().await?;
         }
         Commands::Mode { mode } => {
             println!("Mode: {mode:?}");

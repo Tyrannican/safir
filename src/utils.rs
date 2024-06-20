@@ -5,6 +5,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
+/// Debug flag for testing without affecting my existing store
+const DEBUG: bool = true;
+
 /// Confirmation dialog for important calls
 pub fn confirm_entry(msg: &str) -> bool {
     let mut answer = String::new();
@@ -54,9 +57,19 @@ pub fn purge_directory(path: impl AsRef<Path>) {
 
 /// Create the .safirstore directory in the user HOME
 pub fn create_safir_workspace() -> PathBuf {
+    let store_dir = if DEBUG {
+        ".safirstore_debug"
+    } else {
+        ".safirstore"
+    };
+
+    if DEBUG {
+        println!("DEBUG: Creating safir store at debug location");
+    }
+
     match dirs::home_dir() {
         Some(home) => {
-            let working_dir = home.join(".safirstore");
+            let working_dir = home.join(store_dir);
             fs::create_dir_all(&working_dir).expect("unable to create main directory");
 
             working_dir
