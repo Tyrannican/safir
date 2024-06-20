@@ -13,28 +13,28 @@ fn main() -> Result<()> {
 
     match &cli.command {
         Commands::Add { key, value } => {
-            safir.add(key.to_owned(), value.to_owned());
+            // safir.add(key.to_owned(), value.to_owned());
         }
-        Commands::Get(args) => {
-            safir.get(args.keys.to_owned());
+        Commands::Get { keys } => {
+            // safir.get(args.keys.to_owned());
         }
-        Commands::Rm(args) => {
-            safir.remove(args.keys.to_owned());
+        Commands::Rm { keys } => {
+            // safir.remove(args.keys.to_owned());
         }
-        Commands::Alias(args) => {
-            safir.custom_display("alias", args.keys.to_owned());
+        Commands::Alias { keys } => {
+            // safir.custom_display("alias", args.keys.to_owned());
         }
-        Commands::Export(args) => {
-            safir.custom_display("export", args.keys.to_owned());
+        Commands::Export { keys } => {
+            // safir.custom_display("export", args.keys.to_owned());
         }
         Commands::List => {
-            safir.list();
+            // safir.list();
         }
         Commands::Clear => {
-            safir.clear();
+            // safir.clear();
         }
         Commands::Purge => {
-            safir.purge();
+            // safir.purge();
         }
     }
 
