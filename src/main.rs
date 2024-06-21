@@ -36,6 +36,10 @@ async fn main() -> Result<()> {
             let mut cfg = safir.get_config();
             cfg.mode = mode;
             cfg.write().context("writing config out")?;
+            println!(
+                "Set store mode to: '{:?}'\nActive on the next run of Safir!",
+                cfg.mode
+            );
         }
     }
 

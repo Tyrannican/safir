@@ -5,9 +5,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-/// Debug flag for testing without affecting my existing store
-const DEBUG: bool = true;
-
 /// Type to represent a KVPair
 pub type KVPair = (String, String);
 
@@ -70,18 +67,9 @@ pub fn purge_directory(path: impl AsRef<Path>) {
 
 /// Create the .safirstore directory in the user HOME
 pub fn load_safir_workspace() -> PathBuf {
-    let store_dir = if DEBUG {
-        ".debug_safirstore"
-    } else {
-        ".safirstore"
-    };
-
     match dirs::home_dir() {
         Some(home) => {
-            let working_dir = home.join(store_dir);
-            if DEBUG && !working_dir.exists() {
-                println!("DEBUG: Creating safir store at debug location");
-            }
+            let working_dir = home.join(".safirstore");
             fs::create_dir_all(&working_dir).expect("unable to create main directory");
 
             working_dir
