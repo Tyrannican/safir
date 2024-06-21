@@ -1,16 +1,22 @@
-use crate::{store::SafirStore, utils};
+use crate::{
+    store::{config::SafirConfig, SafirStore},
+    utils,
+};
+
 use anyhow::Result;
 use async_trait::async_trait;
+
 use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Debug, Clone)]
 pub struct KVStore {
-    pub path: PathBuf,
-    pub store: HashMap<String, String>,
+    path: PathBuf,
+    store: HashMap<String, String>,
+    config: SafirConfig,
 }
 
 impl KVStore {
-    pub fn load(ws: PathBuf) -> Self {
+    pub fn load(ws: PathBuf, config: SafirConfig) -> Self {
         let store_path = ws.join("safirstore.json");
         let store = if store_path.exists() {
             utils::load_store(&store_path)
@@ -22,15 +28,8 @@ impl KVStore {
 
         Self {
             path: store_path,
+            config,
             store,
-        }
-    }
-
-    pub fn custom_display(&self, display_cmd: &str, keys: Vec<String>) {
-        for key in keys.iter() {
-            if let Some(value) = self.store.get(key) {
-                println!("{display_cmd} {key}=\"{value}\"");
-            }
         }
     }
 }
@@ -98,5 +97,9 @@ impl SafirStore for KVStore {
         }
 
         Ok(())
+    }
+
+    fn get_config(&self) -> SafirConfig {
+        self.config.clone()
     }
 }

@@ -29,7 +29,9 @@ async fn main() -> Result<()> {
         Commands::Clear => safir.clear().await?,
         Commands::Purge => safir.purge().await?,
         Commands::Mode { mode } => {
-            println!("Mode: {mode:?}");
+            let mut cfg = safir.get_config();
+            cfg.mode = mode;
+            cfg.write().context("writing config out")?;
         }
     }
 

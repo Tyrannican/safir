@@ -5,17 +5,18 @@ use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePool, SqlitePo
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use crate::store::SafirStore;
+use crate::store::{config::SafirConfig, SafirStore};
 
 #[derive(Debug, Clone)]
 pub struct SqliteStore {
     pool: SqlitePool,
+    config: SafirConfig,
 }
 
 impl SqliteStore {
-    pub(crate) async fn load(wd: PathBuf) -> Result<Self> {
+    pub(crate) async fn load(ws: PathBuf, config: SafirConfig) -> Result<Self> {
         let lead = PathBuf::from("sqlite:/");
-        let db_name = lead.join(wd).join("safirstore.db");
+        let db_name = lead.join(ws).join("safirstore.db");
 
         let connect_opts = SqliteConnectOptions::from_str(db_name.to_str().unwrap())?
             .optimize_on_close(true, None)
@@ -29,7 +30,7 @@ impl SqliteStore {
             .context("creating database")?;
 
         Self::setup_db(&pool).await?;
-        Ok(Self { pool })
+        Ok(Self { pool, config })
     }
 
     async fn setup_db(pool: &SqlitePool) -> Result<()> {
@@ -61,5 +62,9 @@ impl SafirStore for SqliteStore {
     }
     async fn purge(&mut self) -> Result<()> {
         Ok(())
+    }
+
+    fn get_config(&self) -> SafirConfig {
+        self.config.clone()
     }
 }

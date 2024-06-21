@@ -1,16 +1,14 @@
+pub mod config;
 pub mod db_store;
 pub mod file_store;
 
 use crate::utils;
+use config::{SafirConfig, SafirMode};
 
-use std::path::Path;
-
-use anyhow::{Context, Result};
+use anyhow::Result;
 use async_trait::async_trait;
-use clap::ValueEnum;
 use db_store::SqliteStore;
 use file_store::KVStore;
-use serde::{Deserialize, Serialize};
 
 #[async_trait]
 pub trait SafirStore {
@@ -20,37 +18,15 @@ pub trait SafirStore {
     async fn remove(&mut self, keys: Vec<String>) -> Result<()>;
     async fn clear(&mut self) -> Result<()>;
     async fn purge(&mut self) -> Result<()>;
-}
-
-#[derive(ValueEnum, Default, Debug, Copy, PartialEq, Eq, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum SafirMode {
-    #[default]
-    File,
-    Database,
-}
-
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
-pub struct SafirConfig {
-    mode: SafirMode,
-}
-
-impl SafirConfig {
-    pub fn load(workdir: impl AsRef<Path>) -> Result<Self> {
-        let fp = workdir.as_ref().join("safirstore.cfg");
-        if !fp.exists() {
-            return Ok(Self::default());
-        }
-        let contents = std::fs::read_to_string(&fp).context("loading safir config")?;
-        serde_json::from_str(&contents).context("deserializing safir config")
-    }
+    fn get_config(&self) -> SafirConfig;
 }
 
 pub async fn init_safir() -> Result<Box<dyn SafirStore>> {
     let ws = utils::create_safir_workspace();
     let cfg = SafirConfig::load(&ws).expect("can't load safir config");
+
     match cfg.mode {
-        SafirMode::File => Ok(Box::new(KVStore::load(ws))),
-        SafirMode::Database => Ok(Box::new(SqliteStore::load(ws).await?)),
+        SafirMode::File => Ok(Box::new(KVStore::load(ws, cfg))),
+        SafirMode::Database => Ok(Box::new(SqliteStore::load(ws, cfg).await?)),
     }
 }

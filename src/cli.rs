@@ -1,5 +1,5 @@
 //! CLI for using the Safir binary
-use crate::store::SafirMode;
+use crate::store::config::SafirMode;
 pub use clap::{Parser, Subcommand};
 
 /// CLI arguments for running the program

@@ -31,6 +31,13 @@ pub fn display_kv(key: &str, value: &str) {
     println!("{key}=\"{value}\"")
 }
 
+/// Output key-value pairs with a leading string (e.g. alias or export)
+pub fn custom_display(display_cmd: &str, keys: Vec<String>, values: Vec<String>) {
+    for (key, value) in keys.iter().zip(values.iter()) {
+        println!("{display_cmd} {key}=\"{value}\"");
+    }
+}
+
 /// Loads the store from disk
 pub fn load_store(path: impl AsRef<Path>) -> HashMap<String, String> {
     let contents = std::fs::read_to_string(path.as_ref()).expect("unable to store contents");
@@ -58,7 +65,7 @@ pub fn purge_directory(path: impl AsRef<Path>) {
 /// Create the .safirstore directory in the user HOME
 pub fn create_safir_workspace() -> PathBuf {
     let store_dir = if DEBUG {
-        ".safirstore_debug"
+        ".debug_safirstore"
     } else {
         ".safirstore"
     };
