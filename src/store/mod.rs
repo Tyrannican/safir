@@ -6,11 +6,13 @@ use crate::utils;
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use async_trait::async_trait;
 use clap::ValueEnum;
 use db_store::SqliteStore;
 use file_store::KVStore;
 use serde::{Deserialize, Serialize};
 
+#[async_trait]
 pub trait SafirStore {
     async fn add(&mut self, key: String, value: String) -> Result<()>;
     async fn get(&self, keys: Vec<String>) -> Result<()>;
@@ -44,12 +46,11 @@ impl SafirConfig {
     }
 }
 
-pub async fn init_safir() -> Result<impl SafirStore> {
+pub async fn init_safir() -> Result<Box<dyn SafirStore>> {
     let ws = utils::create_safir_workspace();
     let cfg = SafirConfig::load(&ws).expect("can't load safir config");
-
     match cfg.mode {
-        SafirMode::File => Ok(KVStore::load(ws)),
-        SafirMode::Database => unimplemented!("fix this"),
+        SafirMode::File => Ok(Box::new(KVStore::load(ws))),
+        SafirMode::Database => Ok(Box::new(SqliteStore::load(ws).await?)),
     }
 }

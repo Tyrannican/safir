@@ -1,7 +1,9 @@
 use crate::{store::SafirStore, utils};
 use anyhow::Result;
+use async_trait::async_trait;
 use std::{collections::HashMap, path::PathBuf};
 
+#[derive(Debug, Clone)]
 pub struct KVStore {
     pub path: PathBuf,
     pub store: HashMap<String, String>,
@@ -33,6 +35,7 @@ impl KVStore {
     }
 }
 
+#[async_trait]
 impl SafirStore for KVStore {
     async fn add(&mut self, key: String, value: String) -> Result<()> {
         if let Some(v) = self.store.get(&key) {

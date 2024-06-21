@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use async_trait::async_trait;
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePool, SqlitePoolOptions};
 
 use std::path::PathBuf;
@@ -41,6 +42,7 @@ impl SqliteStore {
     }
 }
 
+#[async_trait]
 impl SafirStore for SqliteStore {
     async fn add(&mut self, key: String, value: String) -> Result<()> {
         Ok(())
