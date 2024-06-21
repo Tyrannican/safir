@@ -8,6 +8,9 @@ use std::{
 /// Debug flag for testing without affecting my existing store
 const DEBUG: bool = true;
 
+/// Type to represent a KVPair
+pub type KVPair = (String, String);
+
 /// Confirmation dialog for important calls
 pub fn confirm_entry(msg: &str) -> bool {
     let mut answer = String::new();
@@ -19,21 +22,22 @@ pub fn confirm_entry(msg: &str) -> bool {
         .expect("unable to get input from user");
 
     let answer = answer.trim().to_lowercase();
-    if answer == "y" || answer == "yes" {
-        return true;
-    }
 
-    false
+    answer == "y" || answer == "yes"
 }
 
-/// Outputs the Key-Value pair
-pub fn display_kv(key: &str, value: &str) {
-    println!("{key}=\"{value}\"")
+/// Outputs multiple KV pairs
+pub fn display_multiple_kv(kvs: Vec<KVPair>) {
+    for kv in kvs.into_iter() {
+        let (key, value) = kv;
+        println!("{key}=\"{value}\"");
+    }
 }
 
 /// Output key-value pairs with a leading string (e.g. alias or export)
-pub fn custom_display(display_cmd: &str, keys: Vec<String>, values: Vec<String>) {
-    for (key, value) in keys.iter().zip(values.iter()) {
+pub fn custom_display(display_cmd: &str, kvs: Vec<KVPair>) {
+    for kv in kvs.into_iter() {
+        let (key, value) = kv;
         println!("{display_cmd} {key}=\"{value}\"");
     }
 }
@@ -59,24 +63,25 @@ pub fn write_store(store: &HashMap<String, String>, path: impl AsRef<Path>) {
 
 /// Remove the .safirstore directory
 pub fn purge_directory(path: impl AsRef<Path>) {
-    std::fs::remove_dir_all(path).expect("unable to remove safirstore directory");
+    if path.as_ref().exists() {
+        std::fs::remove_dir_all(path).expect("unable to remove safirstore directory");
+    }
 }
 
 /// Create the .safirstore directory in the user HOME
-pub fn create_safir_workspace() -> PathBuf {
+pub fn load_safir_workspace() -> PathBuf {
     let store_dir = if DEBUG {
         ".debug_safirstore"
     } else {
         ".safirstore"
     };
 
-    if DEBUG {
-        println!("DEBUG: Creating safir store at debug location");
-    }
-
     match dirs::home_dir() {
         Some(home) => {
             let working_dir = home.join(store_dir);
+            if DEBUG && !working_dir.exists() {
+                println!("DEBUG: Creating safir store at debug location");
+            }
             fs::create_dir_all(&working_dir).expect("unable to create main directory");
 
             working_dir

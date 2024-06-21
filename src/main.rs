@@ -11,21 +11,25 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
     let mut safir = store::init_safir().await.context("loading safir store")?;
 
-    // This is stupid
     match cli.command {
         Commands::Add { key, value } => safir.add(key.to_owned(), value.to_owned()).await?,
-        Commands::Get { keys } => safir.get(keys.to_owned()).await?,
+        Commands::Get { keys } => {
+            let kvs = safir.get(keys.to_owned()).await?;
+            utils::display_multiple_kv(kvs);
+        }
         Commands::Rm { keys } => safir.remove(keys.to_owned()).await?,
-        Commands::Alias { keys: _ } => {
-            // TODO: Fix custom displays
-            unimplemented!("alias needs work");
-            // safir.custom_display("alias", keys.to_owned()).await?;
+        Commands::Alias { keys } => {
+            let kvs = safir.get(keys.to_owned()).await?;
+            utils::custom_display("alias", kvs);
         }
-        Commands::Export { keys: _ } => {
-            unimplemented!("export needs work");
-            // safir.custom_display("export", keys.to_owned()).await?;
+        Commands::Export { keys } => {
+            let kvs = safir.get(keys.to_owned()).await?;
+            utils::custom_display("export", kvs);
         }
-        Commands::List => safir.list().await?,
+        Commands::List => {
+            let kvs = safir.list().await?;
+            utils::display_multiple_kv(kvs);
+        }
         Commands::Clear => safir.clear().await?,
         Commands::Purge => safir.purge().await?,
         Commands::Mode { mode } => {
@@ -35,6 +39,5 @@ async fn main() -> Result<()> {
         }
     }
 
-    // utils::write_store(&safir.store, &safir.file);
     Ok(())
 }

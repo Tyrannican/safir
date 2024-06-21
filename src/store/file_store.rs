@@ -1,6 +1,6 @@
 use crate::{
     store::{config::SafirConfig, SafirStore},
-    utils,
+    utils::{self, KVPair},
 };
 
 use anyhow::Result;
@@ -10,7 +10,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Debug, Clone)]
 pub struct KVStore {
-    path: PathBuf,
+    loc: PathBuf,
     store: HashMap<String, String>,
     config: SafirConfig,
 }
@@ -27,7 +27,7 @@ impl KVStore {
         };
 
         Self {
-            path: store_path,
+            loc: store_path,
             config,
             store,
         }
@@ -46,25 +46,31 @@ impl SafirStore for KVStore {
             self.store.insert(key, value);
         }
 
-        Ok(())
-    }
-
-    async fn get(&self, keys: Vec<String>) -> Result<()> {
-        for key in keys.iter() {
-            if let Some(value) = self.store.get(key) {
-                utils::display_kv(key, value);
-            }
-        }
+        utils::write_store(&self.store, &self.loc);
 
         Ok(())
     }
 
-    async fn list(&self) -> Result<()> {
-        for (key, value) in self.store.iter() {
-            utils::display_kv(key, value);
-        }
+    async fn get(&self, keys: Vec<String>) -> Result<Vec<KVPair>> {
+        let kvs: Vec<KVPair> = keys
+            .into_iter()
+            .filter_map(|key| match self.store.get(&key) {
+                Some(value) => Some((key, value.clone())),
+                None => None,
+            })
+            .collect();
 
-        Ok(())
+        Ok(kvs)
+    }
+
+    async fn list(&self) -> Result<Vec<KVPair>> {
+        let kvs: Vec<KVPair> = self
+            .store
+            .iter()
+            .map(|(key, value)| (key.clone(), value.clone()))
+            .collect();
+
+        Ok(kvs)
     }
 
     async fn remove(&mut self, keys: Vec<String>) -> Result<()> {
@@ -77,6 +83,8 @@ impl SafirStore for KVStore {
             }
         }
 
+        utils::write_store(&self.store, &self.loc);
+
         Ok(())
     }
     async fn clear(&mut self) -> Result<()> {
@@ -85,14 +93,17 @@ impl SafirStore for KVStore {
             self.store.clear();
         }
 
+        utils::write_store(&self.store, &self.loc);
+
         Ok(())
     }
 
     async fn purge(&mut self) -> Result<()> {
         let confirm_msg =
             "Are you sure you want to remove the .safirstore directory and ALL contents?";
+        let ws = utils::load_safir_workspace();
         if utils::confirm_entry(&confirm_msg) {
-            utils::purge_directory(self.path.clone());
+            utils::purge_directory(ws);
             std::process::exit(0);
         }
 
