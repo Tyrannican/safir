@@ -1,5 +1,4 @@
 use std::{
-    collections::HashMap,
     fs,
     io::Write,
     path::{Path, PathBuf},
@@ -37,25 +36,6 @@ pub fn custom_display(display_cmd: &str, kvs: Vec<KVPair>) {
         let (key, value) = kv;
         println!("{display_cmd} {key}=\"{value}\"");
     }
-}
-
-/// Loads the store from disk
-pub fn load_store(path: impl AsRef<Path>) -> HashMap<String, String> {
-    let contents = std::fs::read_to_string(path.as_ref()).expect("unable to store contents");
-
-    return serde_json::from_str::<HashMap<String, String>>(&contents)
-        .expect("unable to deserialize store contents");
-}
-
-/// Writes the store to disk
-pub fn write_store(store: &HashMap<String, String>, path: impl AsRef<Path>) {
-    let str_store =
-        serde_json::to_string_pretty(store).expect("unable to serialize store contents");
-
-    let mut file = std::fs::File::create(&path).expect("unable to get file handle");
-
-    file.write_all(str_store.as_bytes())
-        .expect("unable to write store out to disk");
 }
 
 /// Remove the .safirstore directory

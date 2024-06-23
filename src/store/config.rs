@@ -17,6 +17,8 @@ pub struct SafirConfig {
     #[serde(skip)]
     pub filepath: PathBuf,
 
+    pub environment: String,
+
     pub mode: SafirMode,
 }
 
@@ -26,6 +28,7 @@ impl SafirConfig {
         if !fp.exists() {
             let cfg = Self {
                 filepath: fp,
+                environment: "default".to_string(),
                 mode: SafirMode::File,
             };
             cfg.write().context("writing config out")?;

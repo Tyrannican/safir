@@ -49,9 +49,10 @@ impl SqliteStore {
 #[async_trait]
 impl SafirStore for SqliteStore {
     async fn add(&mut self, key: String, value: String) -> Result<()> {
-        sqlx::query("insert into safir(key, value) values(?1, ?2)")
+        sqlx::query("insert into safir(key, value, environment) values(?1, ?2, ?3)")
             .bind(&key)
             .bind(&value)
+            .bind(&self.config.environment)
             .execute(&self.pool)
             .await
             .with_context(|| format!("insert {key} - {value} into database"))?;
@@ -65,7 +66,11 @@ impl SafirStore for SqliteStore {
             .map(|k| format!("'{k}'"))
             .collect::<Vec<String>>();
 
-        let query = format!("select * from safir where key in ({})", keys.join(", "));
+        let query = format!(
+            "select * from safir where environment = '{}' and key in ({})",
+            &self.config.environment,
+            keys.join(", ")
+        );
         let results: Vec<KVPair> = sqlx::query_as::<_, KVPair>(&query)
             .fetch_all(&self.pool)
             .await?;
@@ -74,7 +79,11 @@ impl SafirStore for SqliteStore {
     }
 
     async fn list(&self) -> Result<Vec<KVPair>> {
-        let results: Vec<KVPair> = sqlx::query_as::<_, KVPair>("select * from safir")
+        let query = format!(
+            "select * from safir where environment = '{}'",
+            self.config.environment
+        );
+        let results: Vec<KVPair> = sqlx::query_as::<_, KVPair>(&query)
             .fetch_all(&self.pool)
             .await?;
 
@@ -87,7 +96,11 @@ impl SafirStore for SqliteStore {
             .map(|k| format!("'{k}'"))
             .collect::<Vec<String>>();
 
-        let query = format!("delete from safir where key in ({})", keys.join(", "));
+        let query = format!(
+            "delete from safir where environment = '{}' and key in ({})",
+            self.config.environment,
+            keys.join(", ")
+        );
         let _ = sqlx::query_as::<_, KVPair>(&query)
             .fetch_all(&self.pool)
             .await?;
@@ -97,7 +110,11 @@ impl SafirStore for SqliteStore {
 
     async fn clear(&mut self) -> Result<()> {
         if confirm_entry("Are you sure you want to clear the safirstore?") {
-            let _ = sqlx::query_as::<_, KVPair>("delete from safir")
+            let query = format!(
+                "delete from safir where environment = '{}'",
+                self.config.environment
+            );
+            let _ = sqlx::query_as::<_, KVPair>(&query)
                 .fetch_all(&self.pool)
                 .await?;
         }

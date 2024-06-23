@@ -63,4 +63,11 @@ pub enum Commands {
 
     /// Purges the .safirstore directory, removing it and its contents
     Purge,
+
+    /// Use / create an environment to store key / value pairs
+    Use {
+        /// Name of the environment to use / create
+        #[arg(default_value_t = String::from("default"))]
+        environment: String,
+    },
 }

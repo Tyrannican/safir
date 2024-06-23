@@ -41,6 +41,12 @@ async fn main() -> Result<()> {
                 cfg.mode
             );
         }
+        Commands::Use { environment } => {
+            let mut cfg = safir.get_config();
+            cfg.environment = environment.clone();
+            cfg.write().context("writing config out")?;
+            println!("Using environment '{}'", environment);
+        }
     }
 
     Ok(())
