@@ -33,15 +33,35 @@ Commands:
   rm      Remove values from the store
   alias   Output the alias command for  key / value pairs
   export  Output the export command for a key / value pairs
+  mode    Sets the mode for Safir (active on the next run of Safir)
   list    List all values in the store
   clear   Clear all keys/values from the store
   purge   Purges the .safirstore directory, removing it and its contents
+  use     Use / create an environment to store key / value pairs
   help    Print this message or the help of the given subcommand(s)
 
 Options:
   -h, --help     Print help
   -V, --version  Print version
 ```
+
+## File Mode vs Database Mode
+
+File mode is just like the old version of `safir` - all KV pairs are stored in a JSON value like before.
+
+Database mode uses an SQLite database as storage instead which is _technically_ more secure.
+
+Switching between modes does not carry over any changes from the previous mode (i.e. KV pairs added in File mode are not present in Database mode unless you add them yourself).
+
+This could change in a future release
+
+## Environments
+
+Safir now supports storing KV pairs in specific environments which will declutter the `list` command and also keep all related KV pairs in one single place.
+
+When Safir is loaded initially, it creates a new `default` environment (or loads an existing one) and uses that unlesss you switch environment.
+
+Stores from older versions of Safir will automatically be ported over to this new format so there is no worry of lost data!
 
 ## Examples
 
@@ -102,4 +122,18 @@ Purge the store (remove EVERYTHING `safir` related)
 
 ```bash
 safir purge # Will remove the .safirstore directory
+```
+
+Setting an environment:
+
+```bash
+safir use [environment-name] # This will create an empty environment or load an existing one
+```
+
+Switching between `file` and `database` mode:
+
+```bash
+safir mode file # Switch to using a JSON file for storage
+
+safir mode database # Switch to using an SQLite database for storage
 ```
