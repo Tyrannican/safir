@@ -1,44 +1,53 @@
 mod cli;
-mod utils;
 mod store;
+mod utils;
 
 use cli::*;
-use store::Store;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 
-
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let cli = Cli::parse();
-    let mut safir = Store::init_safir();
+    let mut safir = store::init_safir().await.context("loading safir store")?;
 
-    match &cli.command {
-        Commands::Add(args) => {
-            safir.add(args.key.to_owned(), args.value.to_owned());
+    match cli.command {
+        Commands::Add { key, value } => safir.add(key.to_owned(), value.to_owned()).await?,
+        Commands::Get { keys } => {
+            let kvs = safir.get(keys.to_owned()).await?;
+            utils::display_multiple_kv(kvs);
         }
-        Commands::Get(args) => {
-            safir.get(args.keys.to_owned());
+        Commands::Rm { keys } => safir.remove(keys.to_owned()).await?,
+        Commands::Alias { keys } => {
+            let kvs = safir.get(keys.to_owned()).await?;
+            utils::custom_display("alias", kvs);
         }
-        Commands::Rm(args) => {
-            safir.remove(args.keys.to_owned());
-        }
-        Commands::Alias(args) => {
-            safir.custom_display("alias", args.keys.to_owned());
-        }
-        Commands::Export(args) => {
-            safir.custom_display("export", args.keys.to_owned());
+        Commands::Export { keys } => {
+            let kvs = safir.get(keys.to_owned()).await?;
+            utils::custom_display("export", kvs);
         }
         Commands::List => {
-            safir.list();
+            let kvs = safir.list().await?;
+            utils::display_multiple_kv(kvs);
         }
-        Commands::Clear => {
-            safir.clear();
+        Commands::Clear => safir.clear().await?,
+        Commands::Purge => safir.purge().await?,
+        Commands::Mode { mode } => {
+            let mut cfg = safir.get_config();
+            cfg.mode = mode;
+            cfg.write().context("writing config out")?;
+            println!(
+                "Set store mode to: '{:?}'\nActive on the next run of Safir!",
+                cfg.mode
+            );
         }
-        Commands::Purge => {
-            safir.purge();
+        Commands::Use { environment } => {
+            let mut cfg = safir.get_config();
+            cfg.environment = environment.clone();
+            cfg.write().context("writing config out")?;
+            println!("Using environment '{}'", environment);
         }
     }
 
-    utils::write_store(&safir.store, &safir.file);
     Ok(())
 }

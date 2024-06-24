@@ -2,6 +2,19 @@
 
 Documenting changes between versions beginning from v0.3.0
 
+## v0.10.0
+
+* SQLite DB support
+    * Safir now supports using either a JSON file as storage or an SQLite database
+    * Activate this by running `safir mode database` or `safir mode file`
+
+* Environments
+    * Safir now supports storing Key-Value pairs in specific environments
+    * Calling `safir use [environment-name]` will activate the specific environment
+    * New environments are created empty and stored KV pairs will remain in this environment
+    * A default environment called `default` is used initially
+    * Old stores from previous versions will be ported to this new format automatically
+
 ## v0.9.0
 
 **THIS IS A BREAKING CHANGE**
