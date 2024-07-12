@@ -70,4 +70,7 @@ pub enum Commands {
         #[arg(default_value_t = String::from("default"))]
         environment: String,
     },
+
+    /// Display the current loaded environment
+    Env,
 }
