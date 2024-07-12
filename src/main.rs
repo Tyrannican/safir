@@ -47,6 +47,11 @@ async fn main() -> Result<()> {
             cfg.write().context("writing config out")?;
             println!("Using environment '{}'", environment);
         }
+        Commands::Env => {
+            let cfg = safir.get_config();
+            let env = cfg.environment;
+            println!("Currently loaded environment: '{env}'");
+        }
     }
 
     Ok(())
