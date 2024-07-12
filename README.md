@@ -38,6 +38,7 @@ Commands:
   clear   Clear all keys/values from the store
   purge   Purges the .safirstore directory, removing it and its contents
   use     Use / create an environment to store key / value pairs
+  env     Display the current loaded environment
   help    Print this message or the help of the given subcommand(s)
 
 Options:
@@ -136,4 +137,10 @@ Switching between `file` and `database` mode:
 safir mode file # Switch to using a JSON file for storage
 
 safir mode database # Switch to using an SQLite database for storage
+```
+
+Displaying the currently loaded environment:
+
+```bash
+safir env # Will display the currently loaded environment
 ```
