@@ -2,6 +2,10 @@
 
 Documenting changes between versions beginning from v0.3.0
 
+## v0.10.2
+
+* Reduced binary size - no other changes
+
 ## v0.10.1
 
 * Added new command to display the currently loaded environment
