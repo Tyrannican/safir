@@ -1,6 +1,6 @@
 [package]
 name = "safir"
-version = "0.10.1"
+version = "0.10.2"
 edition = "2021"
 authors = ["Graham Keenan <graham.keenan@outlook.com>"]
 license = "MIT OR Apache-2.0"
@@ -25,6 +25,13 @@ async-trait = "0.1.80"
 [profile.dist]
 inherits = "release"
 lto = "thin"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
 
 # Config for 'cargo dist'
 [workspace.metadata.dist]
