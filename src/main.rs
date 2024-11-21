@@ -49,8 +49,18 @@ async fn main() -> Result<()> {
         }
         Commands::Env => {
             let cfg = safir.get_config();
-            let env = cfg.environment;
-            println!("Currently loaded environment: '{env}'");
+            let current_env = cfg.environment;
+            let envs = safir.environments().await?;
+
+            println!("Safir environments:");
+            for env in envs {
+                let penv = if env == current_env {
+                    format!("{env} <- Currently loaded")
+                } else {
+                    env
+                };
+                println!("- {penv}");
+            }
         }
     }
 

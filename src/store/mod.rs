@@ -18,6 +18,7 @@ pub trait SafirStore {
     async fn remove(&mut self, keys: Vec<String>) -> Result<()>;
     async fn clear(&mut self) -> Result<()>;
     async fn purge(&mut self) -> Result<()>;
+    async fn environments(&self) -> Result<Vec<String>>;
     fn get_config(&self) -> SafirConfig;
 }
 

@@ -133,6 +133,12 @@ impl SafirStore for SqliteStore {
         Ok(())
     }
 
+    async fn environments(&self) -> Result<Vec<String>> {
+        let query = format!("select distinct environment from safir");
+        let result: Vec<String> = sqlx::query_scalar(&query).fetch_all(&self.pool).await?;
+        Ok(result)
+    }
+
     fn get_config(&self) -> SafirConfig {
         self.config.clone()
     }

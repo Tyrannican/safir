@@ -187,6 +187,10 @@ impl SafirStore for KVStore {
         Ok(())
     }
 
+    async fn environments(&self) -> Result<Vec<String>> {
+        Ok(self.store.keys().map(|e| e.to_string()).collect())
+    }
+
     fn get_config(&self) -> SafirConfig {
         self.config.clone()
     }
