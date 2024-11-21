@@ -2,6 +2,10 @@
 
 Documenting changes between versions beginning from v0.3.0
 
+## v0.10.3
+
+* `safir env` now lists all existing environments and indicates the currently loaded one
+
 ## v0.10.2
 
 * Reduced binary size - no other changes
