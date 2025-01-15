@@ -2,6 +2,13 @@
 
 Documenting changes between versions beginning from v0.3.0
 
+## v0.11.0
+
+**THIS IS A BREAKING CHANGE**
+
+* Removed the File store backend as this project will be using DBs going forward.
+* Going forward, you should intend to move your current setup to the DB backend or stay on `v0.10.3`
+
 ## v0.10.3
 
 * `safir env` now lists all existing environments and indicates the currently loaded one
