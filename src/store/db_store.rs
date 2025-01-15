@@ -127,15 +127,15 @@ impl SafirStore for SqliteStore {
         let confirm_msg =
             "Are you sure you want to purge the safirstore?\nThis will delete the folder and any data inside!";
 
-        if confirm_entry(&confirm_msg) {
+        if confirm_entry(confirm_msg) {
             purge_directory(ws);
         }
         Ok(())
     }
 
     async fn environments(&self) -> Result<Vec<String>> {
-        let query = format!("select distinct environment from safir");
-        let result: Vec<String> = sqlx::query_scalar(&query).fetch_all(&self.pool).await?;
+        let query = "select distinct environment from safir";
+        let result: Vec<String> = sqlx::query_scalar(query).fetch_all(&self.pool).await?;
         Ok(result)
     }
 

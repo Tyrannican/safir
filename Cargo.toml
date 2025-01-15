@@ -1,14 +1,14 @@
 [package]
 name = "safir"
-version = "0.10.3"
+version = "0.11.0"
 edition = "2021"
 authors = ["Graham Keenan <graham.keenan@outlook.com>"]
 license = "MIT OR Apache-2.0"
-description = "Key/Value store to share values between different shell sessions"
+description = "CLI Key/Value store backed by an SQLite3 DB"
 readme = "README.md"
 homepage = "https://github.com/Tyrannican/safir"
 repository = "https://github.com/Tyrannican/safir" 
-keywords = ["cli", "terminal", "utility", "key-value", "store"]
+keywords = ["cli", "terminal", "utility", "key-value", "store", "database"]
 categories = ["command-line-utilities"]
 
 [dependencies]

@@ -1,15 +1,15 @@
 pub mod config;
 pub mod db_store;
-pub mod file_store;
 
 use crate::utils::{load_safir_workspace, KVPair};
-use config::{SafirConfig, SafirMode};
+use config::SafirConfig;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use db_store::SqliteStore;
-use file_store::KVStore;
 
+// Trait to be used by any storage backend
+// SQLite3 for now
 #[async_trait]
 pub trait SafirStore {
     async fn add(&mut self, key: String, value: String) -> Result<()>;
@@ -26,8 +26,5 @@ pub async fn init_safir() -> Result<Box<dyn SafirStore>> {
     let ws = load_safir_workspace();
     let cfg = SafirConfig::load(&ws).expect("can't load safir config");
 
-    match cfg.mode {
-        SafirMode::File => Ok(Box::new(KVStore::load(ws, cfg))),
-        SafirMode::Database => Ok(Box::new(SqliteStore::load(ws, cfg).await?)),
-    }
+    Ok(Box::new(SqliteStore::load(ws, cfg).await?))
 }
