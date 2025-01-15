@@ -8,7 +8,7 @@ description = "CLI Key/Value store backed by an SQLite3 DB"
 readme = "README.md"
 homepage = "https://github.com/Tyrannican/safir"
 repository = "https://github.com/Tyrannican/safir" 
-keywords = ["cli", "terminal", "utility", "key-value", "store", "database"]
+keywords = ["cli", "utility", "key-value", "store", "database"]
 categories = ["command-line-utilities"]
 
 [dependencies]
