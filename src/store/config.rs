@@ -1,16 +1,7 @@
 use anyhow::{Context, Result};
-use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 
 use std::path::{Path, PathBuf};
-
-#[derive(ValueEnum, Default, Debug, Copy, PartialEq, Eq, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum SafirMode {
-    #[default]
-    File,
-    Database,
-}
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct SafirConfig {
@@ -18,8 +9,6 @@ pub struct SafirConfig {
     pub filepath: PathBuf,
 
     pub environment: String,
-
-    pub mode: SafirMode,
 }
 
 impl SafirConfig {
@@ -29,7 +18,6 @@ impl SafirConfig {
             let cfg = Self {
                 filepath: fp,
                 environment: "default".to_string(),
-                mode: SafirMode::File,
             };
             cfg.write().context("writing config out")?;
 

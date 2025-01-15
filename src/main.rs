@@ -32,15 +32,6 @@ async fn main() -> Result<()> {
         }
         Commands::Clear => safir.clear().await?,
         Commands::Purge => safir.purge().await?,
-        Commands::Mode { mode } => {
-            let mut cfg = safir.get_config();
-            cfg.mode = mode;
-            cfg.write().context("writing config out")?;
-            println!(
-                "Set store mode to: '{:?}'\nActive on the next run of Safir!",
-                cfg.mode
-            );
-        }
         Commands::Use { environment } => {
             let mut cfg = safir.get_config();
             cfg.environment = environment.clone();
