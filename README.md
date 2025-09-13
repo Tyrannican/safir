@@ -46,16 +46,6 @@ Options:
   -V, --version  Print version
 ```
 
-## File Mode vs Database Mode
-
-File mode is just like the old version of `safir` - all KV pairs are stored in a JSON value like before.
-
-Database mode uses an SQLite database as storage instead which is _technically_ more secure.
-
-Switching between modes does not carry over any changes from the previous mode (i.e. KV pairs added in File mode are not present in Database mode unless you add them yourself).
-
-This could change in a future release
-
 ## Environments
 
 Safir now supports storing KV pairs in specific environments which will declutter the `list` command and also keep all related KV pairs in one single place.
